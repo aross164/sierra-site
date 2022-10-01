@@ -1,0 +1,64 @@
+.app{
+    padding: 1em;
+    padding-right: 3em;
+}
+
+h1{
+    margin-top: 0;
+    text-align: center;
+}
+
+h2{
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.team-container{
+    padding-bottom: 1em;
+}
+
+.editor-container{
+    max-width: 600px;
+    border: 1px solid black;
+}
+
+.flex{
+    display: flex;
+}
+
+.align-center{
+    align-items: center;
+}
+
+.week-option{
+    text-decoration: underline;
+    color: #0066cc;
+    cursor: pointer;
+}
+
+.week-option.current{
+    text-decoration: none;
+    cursor: default;
+    color: black;
+}
+
+.week-option:not(.current):hover{
+    color: #ee0000;
+}
+
+.save-button{
+    position: fixed;
+    bottom: 2em;
+    right: 1em;
+}
+
+.blurb-container {
+    box-shadow: 2px 2px 8px 2px rgba(0,0,0,0.3);
+    padding: 0.5em;
+    margin-bottom: 1em;
+    border-radius: 0.375em;
+}
+
+p {
+    margin: 0;
+}
