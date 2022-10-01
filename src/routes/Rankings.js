@@ -3,7 +3,6 @@ import {Link, useParams} from 'react-router-dom';
 import AppContext from '../contexts/AppContext';
 import {convertFromRaw} from 'draft-js';
 import {stateToHTML} from 'draft-js-export-html';
-import {redirect} from 'react-router-dom';
 
 function Rankings(){
     const {newestWeek, teams, allRankings} = useContext(AppContext);
@@ -57,7 +56,7 @@ function Rankings(){
                     <div>Select Week:</div>
                     {
                         weeks.map(week => (
-                            <Link key={week} className={`week-option ${week == currentWeek ? 'current' : ''}`}
+                            <Link key={week} className={`week-option ${week === parseInt(currentWeek) ? 'current' : ''}`}
                                   to={`/rankings/${week}`}>
                                 {week}
                             </Link>
