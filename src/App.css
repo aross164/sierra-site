@@ -51,13 +51,17 @@ h2{
     right: 1em;
 }
 
-.blurb-container {
-    box-shadow: 2px 2px 8px 2px rgba(0,0,0,0.3);
+.blurb-container{
+    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.3);
     padding: 0.5em;
     margin-bottom: 1em;
     border-radius: 0.375em;
 }
 
-p {
+p{
     margin: 0;
+}
+
+.public-DraftStyleDefault-block{
+    margin: 0 !important;
 }
