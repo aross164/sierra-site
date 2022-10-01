@@ -100,7 +100,7 @@ function EditRankings({week}){
 
     return (
         <>
-            <div style={{flexDirection: 'column'}} className="flex align-center">
+            <div style={{flexDirection: 'column', paddingRight: '2em'}} className="flex align-center">
                 <h1>Week {week} Rankings</h1>
                 {
                     Object.entries(editorStates).sort((aTeam, bTeam) => aTeam[1].ranking - bTeam[1].ranking)
