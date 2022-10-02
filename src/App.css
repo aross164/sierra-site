@@ -13,11 +13,11 @@ h2{
 }
 
 .team-container{
-    padding-bottom: 1em;
+    max-width: min(80vw, 600px);
+    padding-bottom: 3em;
 }
 
 .editor-container{
-    max-width: 600px;
     border: 1px solid black;
 }
 
@@ -64,4 +64,40 @@ p{
 
 .public-DraftStyleDefault-block{
     margin: 0 !important;
+}
+
+.avatar{
+    border-radius: 50%;
+    max-width: 2em;
+    max-height: 2em;
+    margin-right: 0.25em;
+}
+
+.break{
+    margin-right: 1em;
+}
+
+.team-name{
+    font-size: 0.7em;
+}
+
+@media only screen and (max-width: 450px) {
+    .break{
+        margin: 0;
+        flex-basis: 100%;
+        height: 0;
+    }
+
+    .edit-rankings h2{
+        font-size: 1.1em;
+    }
+
+    .blurb-container h2{
+        font-size: 1.2em;
+    }
+
+    .button-container{
+        justify-content: flex-end;
+        width: 100%;
+    }
 }

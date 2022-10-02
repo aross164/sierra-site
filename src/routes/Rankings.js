@@ -56,7 +56,8 @@ function Rankings(){
                     <div>Select Week:</div>
                     {
                         weeks.map(week => (
-                            <Link key={week} className={`week-option ${week === parseInt(currentWeek) ? 'current' : ''}`}
+                            <Link key={week}
+                                  className={`week-option ${week === parseInt(currentWeek) ? 'current' : ''}`}
                                   to={`/rankings/${week}`}>
                                 {week}
                             </Link>
@@ -67,7 +68,18 @@ function Rankings(){
                     Object.entries(rankings).sort((aTeam, bTeam) => aTeam[1].ranking - bTeam[1].ranking)
                           .map(([teamId, editorState]) => (
                               <div className="blurb-container" key={teamId}>
-                                  <h2>{editorState.ranking}. {teams[teamId].teamName} ({teams[teamId].displayName})</h2>
+                                  <h2 className="flex align-center">
+                                      {editorState.ranking}.
+                                      <div className="flex align-center" style={{marginLeft: '0.5em'}}>
+                                          {teams[teamId].avatar ?
+                                              <img src={teams[teamId].avatar} className="avatar"
+                                                   alt="avatar"/> : null}
+                                          <div>
+                                              <span>{teams[teamId].teamName}</span>
+                                              <div className="team-name">{teams[teamId].displayName}</div>
+                                          </div>
+                                      </div>
+                                  </h2>
                                   <div dangerouslySetInnerHTML={{__html: rankings[teamId].blurb}}></div>
                               </div>
                           ))

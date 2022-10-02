@@ -100,24 +100,37 @@ function EditRankings({week}){
 
     return (
         <>
-            <div style={{flexDirection: 'column', paddingRight: '2em'}} className="flex align-center">
+            <div style={{flexDirection: 'column', paddingRight: '2em'}} className="flex align-center edit-rankings">
                 <h1>Week {week} Rankings</h1>
                 {
                     Object.entries(editorStates).sort((aTeam, bTeam) => aTeam[1].ranking - bTeam[1].ranking)
                           .map(([teamId, editorState]) => (
                               <div className="team-container" key={teamId}>
-                                  <div className="flex" style={{gap: '1em'}}>
-                                      <h2>{editorState.ranking}. {teams[teamId].teamName} ({teams[teamId].displayName})</h2>
-                                      {editorState.ranking !== 1 ?
-                                          <div className="flex align-center">
-                                              <button onClick={() => moveUp(teamId, editorState.ranking)}>Up</button>
+                                  <h2 className="flex align-center" style={{flexWrap: 'wrap'}}>
+                                      {editorState.ranking}.
+                                      <span className="flex align-center" style={{marginLeft: '1em'}}>
+                                          {teams[teamId].avatar ?
+                                          <img src={teams[teamId].avatar} className="avatar"
+                                               alt="avatar"/> : null}
+                                          <div>
+                                              <span>{teams[teamId].teamName}</span>
+                                              <div className="team-name">{teams[teamId].displayName}</div>
+                                            </div>
+                                      </span>
+                                      <div className="break"/>
+                                      <div className="flex button-container" style={{gap: '0.5em'}}>
+                                          {editorState.ranking !== 1 ?
+                                              <div className="flex align-center">
+                                                  <button onClick={() => moveUp(teamId, editorState.ranking)}>Up
+                                                  </button>
+                                              </div> : null}
+                                          {editorState.ranking !== 12 ? <div className="flex align-center">
+                                              <button
+                                                  onClick={() => moveDown(teamId, editorState.ranking)}>Down
+                                              </button>
                                           </div> : null}
-                                      {editorState.ranking !== 12 ? <div className="flex align-center">
-                                          <button
-                                              onClick={() => moveDown(teamId, editorState.ranking)}>Down
-                                          </button>
-                                      </div> : null}
-                                  </div>
+                                      </div>
+                                  </h2>
                                   <div className="editor-container">
                                       <RichEditor editorState={editorState.blurb}
                                                   setEditorState={(e) => updateEditorState(teamId, e)}/>
