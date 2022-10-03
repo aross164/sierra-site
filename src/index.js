@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import EditRankings from './routes/EditRankings';
 import Rankings from './routes/Rankings';
+import Trades from './routes/Trades';
 
 const router = createBrowserRouter([
     {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
             {
                 path: 'rankings/:week',
                 element: <Rankings/>
+            },
+            {
+                path: 'trades',
+                element: <Trades />
             },
             {
                 path: 'angry',

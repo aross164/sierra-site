@@ -1,0 +1,175 @@
+import React, {useContext, useEffect, useState} from 'react';
+import AppContext from '../contexts/AppContext';
+
+function Trades(){
+    const {newestWeek, league, teams} = useContext(AppContext);
+    const [trades, setTrades] = useState([]);
+    const [players, setPlayers] = useState({});
+
+    useEffect(() => {
+        if(!newestWeek){
+            return;
+        }
+
+        async function fetchTrades(){
+            const weeks = [];
+            let i = 0;
+            while (i <= newestWeek) {
+                weeks.push(i);
+                i++;
+            }
+
+            let newTrades = [];
+            for (const week of weeks) {
+                const response = await fetch(`https://api.sleeper.app/v1/league/${league}/transactions/${week}`);
+                const transactions = await response.json();
+                const curTrades = transactions.filter(transaction => transaction.type === 'trade')
+                                              .map(trade => ({
+                                                  ...trade,
+                                                  week,
+                                                  adds: Object.entries(trade.adds)
+                                                              .map(([playerId, rosterId]) => ({playerId, rosterId}))
+                                                              .reduce((grouped, add) => {
+                                                                  if(!grouped[add.rosterId]){
+                                                                      grouped[add.rosterId] = [];
+                                                                  }
+                                                                  grouped[add.rosterId].push(add);
+                                                                  return grouped;
+                                                              }, {})
+                                              }));
+                newTrades = newTrades.concat(curTrades);
+            }
+
+
+            const newPlayers = {};
+            for (const trade of newTrades) {
+                for(const addGroups of Object.values(trade.adds)){
+                    for (const {playerId} of addGroups) {
+                        if(!newPlayers[playerId]){
+                            newPlayers[playerId] = await fetchPlayer(playerId);
+                        }
+                    }
+                }
+            }
+            setPlayers(newPlayers);
+
+            newTrades.forEach(trade => {
+                Object.values(trade.adds).forEach(addGroup => {
+                    addGroup.forEach(add => {
+                        const stats = Object.entries(newPlayers[add.playerId].stats);
+                        let numWeeks = 0;
+                        let totalPoints = 0;
+                        stats.forEach(([week, weekStats]) => {
+                            if(week < trade.week || !weekStats){
+                                return;
+                            }
+                            numWeeks++;
+                            totalPoints += weekStats.stats.pts_ppr;
+                        });
+                        if(numWeeks){
+                            add.points = totalPoints;
+                            add.average = totalPoints / numWeeks;
+                        }
+                    });
+                });
+            });
+
+            const groupedTrades = newTrades.reduce((grouped, trade) => {
+                if(!grouped[trade.week]){
+                    grouped[trade.week] = [];
+                }
+                grouped[trade.week].push(trade);
+                return grouped;
+            }, {});
+
+            setTrades(groupedTrades);
+        }
+
+        async function fetchPlayer(playerId){
+            const playerResponse = await fetch(`https://api.sleeper.com/players/nfl/${playerId}`);
+            const statsResponse = await fetch(`https://api.sleeper.com/stats/nfl/player/${playerId}?season_type=regular&season=2022&grouping=week`);
+            const promises = await Promise.all([playerResponse, statsResponse]);
+            const [playerData, statsData] = await Promise.all([promises[0].json(), promises[1].json()]);
+            playerData.stats = statsData;
+            return playerData;
+        }
+
+        fetchTrades();
+    }, [newestWeek, league]);
+
+    if(!Object.keys(trades).length){
+        return <div>Loading</div>
+    }
+
+    return (
+        <div className="trades-page flex justify-center">
+            <div>
+                <h1>Trades</h1>
+                {Object.entries(trades).map(([week, curTrades]) => (
+                    <div key={week} style={{marginBottom: '3em'}}>
+                        <h2 style={{fontSize: '1.75em'}}>Week {week - 1}.5</h2>
+                        {curTrades.map(trade => (
+                            <div key={trade.transaction_id} className="trade-container">
+                                {Object.entries(trade.adds)
+                                       .map(([rosterId, addGroup], addGroupIndex) => {
+                                               const team = Object.values(teams)
+                                                                  .find(team => team.rosterId === parseInt(rosterId));
+                                               return (
+                                                   <React.Fragment key={`${trade.transaction_id} ${rosterId}`}>
+                                                       <h3 className="flex align-center justify-center">
+                                                           {team.avatar ?
+                                                               <img className="avatar" src={team.avatar}
+                                                                    alt="avatar"/> : null}
+                                                           <span>
+                                                               <div>{team.teamName}</div>
+                                                               <div className="team-name"
+                                                                    style={{textAlign: 'left'}}>{team.displayName}</div>
+                                                           </span>
+                                                       </h3>
+                                                       <div className="flex justify-center">
+                                                           <table>
+                                                               <thead>
+                                                               <tr>
+                                                                   <th>Player</th>
+                                                                   <th>Tot. Pts</th>
+                                                                   <th>Avg. Pts</th>
+                                                               </tr>
+                                                               </thead>
+                                                               <tbody>
+                                                               {addGroup.map(({
+                                                                                  playerId,
+                                                                                  points,
+                                                                                  average
+                                                                              }) => (
+                                                                       <tr key={`${trade.transaction_id} ${playerId}`}>
+                                                                           <td>
+                                                                               {players[playerId].first_name} {players[playerId].last_name}
+                                                                           </td>
+                                                                           <td>
+                                                                               {points?.toFixed(1) || 0}
+                                                                           </td>
+                                                                           <td>
+                                                                               {average?.toFixed(1) || 0}
+                                                                           </td>
+                                                                       </tr>
+                                                                   )
+                                                               )}
+                                                               </tbody>
+                                                           </table>
+                                                       </div>
+                                                       {addGroupIndex !== Object.values(trade.adds).length - 1 ?
+                                                           <hr/> : null}
+                                                   </React.Fragment>
+                                               );
+                                           }
+                                       )}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default Trades;

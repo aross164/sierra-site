@@ -29,6 +29,10 @@ h2{
     align-items: center;
 }
 
+.justify-center{
+    justify-content: center;
+}
+
 .week-option{
     text-decoration: underline;
     color: #0066cc;
@@ -81,7 +85,69 @@ p{
     font-size: 0.7em;
 }
 
-@media only screen and (max-width: 450px) {
+.trades-page h2{
+    text-align: center;
+}
+
+.trade-container{
+    padding: 0.5em;
+    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1.25em;
+    border-radius: 0.3em;
+    max-width: min(91vw, 400px);
+    width: 350px;
+}
+
+.trade-container h3{
+    margin: 0;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.trade-container :is(td, th){
+    padding: 0.2em 0.5em;
+    text-align: center;
+}
+
+.trade-container th{
+    padding-bottom: 0;
+}
+
+footer {
+    height: 3rem;
+    background-color: black;
+    width: 100vw;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    color: white;
+    align-items: center;
+    justify-content: space-around;
+    font-weight: bold;
+}
+
+footer a {
+    color: white;
+}
+
+.footerPage {
+    cursor: pointer;
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activePage{
+    border-radius: 50%;
+    margin-left: 0.5em;
+    background-color: white;
+    height: 0.6em;
+    width: 0.6em;
+}
+
+@media only screen and (max-width: 450px){
     .break{
         margin: 0;
         flex-basis: 100%;
@@ -92,8 +158,8 @@ p{
         font-size: 1.1em;
     }
 
-    .blurb-container h2{
-        font-size: 1.2em;
+    .blurb-container h2, .trade-container h3{
+        font-size: 1.25em;
     }
 
     .button-container{

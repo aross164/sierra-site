@@ -71,12 +71,12 @@ function Rankings(){
                                   <h2 className="flex align-center">
                                       {editorState.ranking}.
                                       <div className="flex align-center" style={{marginLeft: '0.5em'}}>
-                                          {teams[teamId].avatar ?
-                                              <img src={teams[teamId].avatar} className="avatar"
+                                          {teams[teamId]?.avatar ?
+                                              <img src={teams[teamId]?.avatar} className="avatar"
                                                    alt="avatar"/> : null}
                                           <div>
-                                              <span>{teams[teamId].teamName}</span>
-                                              <div className="team-name">{teams[teamId].displayName}</div>
+                                              <span>{teams[teamId]?.teamName}</span>
+                                              <div className="team-name">{teams[teamId]?.displayName}</div>
                                           </div>
                                       </div>
                                   </h2>

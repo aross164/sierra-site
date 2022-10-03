@@ -1,7 +1,7 @@
 import './App.css';
 import 'draft-js/dist/Draft.css';
 import React, {useState, useEffect} from 'react';
-import {Outlet} from 'react-router-dom';
+import {Link, Outlet, useLocation} from 'react-router-dom';
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import AppContext from './contexts/AppContext';
 // import {stateToHTML} from 'draft-js-export-html';
@@ -30,11 +30,7 @@ function App(){
     const [teams, setTeams] = useState({});
     const [newestWeek, setNewestWeek] = useState(0);
     const [allRankings, setAllRankings] = useState([]);
-
-
-    /*useEffect(() => {
-        setParsedHtml(stateToHTML(editorState.getCurrentContent()));
-    }, [editorState]);*/
+    const location = useLocation();
 
     useEffect(() => {
         fetchTeams();
@@ -54,6 +50,11 @@ function App(){
 
             return foundUsers;
         }, {});
+
+        const rostersResponse = await fetch(`https://api.sleeper.app/v1/league/${league}/rosters`);
+        const rostersRaw = await rostersResponse.json();
+        rostersRaw.forEach(roster => users[roster.owner_id].rosterId = roster.roster_id);
+
         setTeams(users);
     }
 
@@ -74,6 +75,28 @@ function App(){
                 <Outlet/>
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
             </div>
+            <footer>
+                <Link to="/" className="footerPage">
+                    <div>Rankings</div>
+                    {
+                        (location.pathname === '/' || location.pathname.includes('rankings')) &&
+                        <div className="activePage"/>
+                    }
+                </Link>
+                {
+                    <>
+                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                        </div>
+                        <Link to="/trades" className="footerPage">
+                            <div>Trades</div>
+                            {
+                                location.pathname === '/trades' && <div className="activePage"/>
+                            }
+                        </Link>
+                    </>
+                }
+            </footer>
         </AppContext.Provider>
     );
 }
