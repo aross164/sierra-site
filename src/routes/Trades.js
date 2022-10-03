@@ -20,7 +20,7 @@ function Trades(){
             }
 
             let newTrades = [];
-            for (const week of weeks) {
+            await Promise.all(weeks.map(async week => {
                 const response = await fetch(`https://api.sleeper.app/v1/league/${league}/transactions/${week}`);
                 const transactions = await response.json();
                 const curTrades = transactions.filter(transaction => transaction.type === 'trade')
@@ -38,19 +38,23 @@ function Trades(){
                                                               }, {})
                                               }));
                 newTrades = newTrades.concat(curTrades);
-            }
+            }));
 
+            const uniquePlayers = [];
+            newTrades.forEach(trade => {
+                Object.values(trade.adds).forEach(addGroup => {
+                    addGroup.forEach(({playerId}) => {
+                        if(!uniquePlayers.includes(playerId)){
+                            uniquePlayers.push(playerId);
+                        }
+                    });
+                });
+            });
 
             const newPlayers = {};
-            for (const trade of newTrades) {
-                for(const addGroups of Object.values(trade.adds)){
-                    for (const {playerId} of addGroups) {
-                        if(!newPlayers[playerId]){
-                            newPlayers[playerId] = await fetchPlayer(playerId);
-                        }
-                    }
-                }
-            }
+            await Promise.all(uniquePlayers.map(async playerId => {
+                newPlayers[playerId] = await fetchPlayer(playerId);
+            }));
             setPlayers(newPlayers);
 
             newTrades.forEach(trade => {
@@ -98,7 +102,7 @@ function Trades(){
     }, [newestWeek, league]);
 
     if(!Object.keys(trades).length){
-        return <div>Loading</div>
+        return <div>Loading</div>;
     }
 
     return (
@@ -143,7 +147,16 @@ function Trades(){
                                                                               }) => (
                                                                        <tr key={`${trade.transaction_id} ${playerId}`}>
                                                                            <td>
-                                                                               {players[playerId].first_name} {players[playerId].last_name}
+                                                                               <div className="flex justify-center">
+                                                                                   <div>
+                                                                                       <span>{players[playerId].first_name} {players[playerId].last_name}</span>
+                                                                                       <div className="flex trade-player-info"
+                                                                                            style={{justifyContent: 'space-between'}}>
+                                                                                           <span>{players[playerId].position}</span>
+                                                                                           <span>{players[playerId].team}</span>
+                                                                                       </div>
+                                                                                   </div>
+                                                                               </div>
                                                                            </td>
                                                                            <td>
                                                                                {points?.toFixed(1) || 0}
