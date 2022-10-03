@@ -151,6 +151,11 @@ footer a {
     font-size: 0.8em;
 }
 
+.editor-area{
+    min-height: 10em;
+    padding: 0.5em;
+}
+
 @media only screen and (max-width: 450px){
     .break{
         margin: 0;
@@ -173,5 +178,9 @@ footer a {
 
     .trade-player-info{
         font-size: 0.75em;
+    }
+
+    .editor-area{
+        min-height: auto;
     }
 }

@@ -4,6 +4,7 @@ import {Editor} from 'react-draft-wysiwyg';
 const RichEditor = ({editorState, setEditorState}) => {
     return (
         <Editor
+            placeholder="Click here..."
             toolbar={{
                 options:
                     ["inline",
@@ -23,7 +24,7 @@ const RichEditor = ({editorState, setEditorState}) => {
             editorState={editorState}
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
-            editorClassName="editorClassName"
+            editorClassName="editor-area"
             onEditorStateChange={e => setEditorState(e)}
         />
     );
