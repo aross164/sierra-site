@@ -64,7 +64,8 @@ function Trades(){
                         let numWeeks = 0;
                         let totalPoints = 0;
                         stats.forEach(([week, weekStats]) => {
-                            if(week < trade.week || !weekStats){
+                            const tradeWeek = getTradeWeek(trade);
+                            if(week < tradeWeek || !weekStats){
                                 return;
                             }
                             numWeeks++;
@@ -79,10 +80,12 @@ function Trades(){
             });
 
             const groupedTrades = newTrades.reduce((grouped, trade) => {
-                if(!grouped[trade.week]){
-                    grouped[trade.week] = [];
+                const week = getTradeWeek(trade);
+
+                if(!grouped[week]){
+                    grouped[week] = [];
                 }
-                grouped[trade.week].push(trade);
+                grouped[week].push(trade);
                 return grouped;
             }, {});
 
@@ -96,6 +99,21 @@ function Trades(){
             const [playerData, statsData] = await Promise.all([promises[0].json(), promises[1].json()]);
             playerData.stats = statsData;
             return playerData;
+        }
+
+        function getTradeWeek(trade){
+            let week = trade.week;
+
+            const date = new Date(trade.status_updated);
+            const dayName = date.toLocaleString("en-US", {
+                timeZone: "America/Chicago",
+                weekday: 'long'
+            });
+            if(dayName === 'Tuesday'){ // sleeper counts tuesday as previous week
+                week++;
+            }
+
+            return week;
         }
 
         fetchTrades();
