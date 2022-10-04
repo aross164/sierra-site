@@ -108,7 +108,7 @@ function EditRankings({week}){
                               <div className="team-container" key={teamId}>
                                   <h2 className="flex align-center" style={{flexWrap: 'wrap'}}>
                                       {editorState.ranking}.
-                                      <span className="flex align-center" style={{marginLeft: '1em'}}>
+                                      <span className="flex align-center" style={{marginLeft: '0.25em'}}>
                                           {teams[teamId]?.avatar ?
                                           <img src={teams[teamId]?.avatar} className="avatar"
                                                alt="avatar"/> : null}
