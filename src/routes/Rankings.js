@@ -52,17 +52,19 @@ function Rankings(){
         <div style={{flexDirection: 'column'}} className="flex align-center">
             <div style={{maxWidth: '620px'}}>
                 <h1>Sierra Week {currentWeek} Rankings</h1>
-                <div className="flex" style={{gap: '2em', marginBottom: '1em'}}>
+                <div className="flex align-center" style={{gap: '1em', marginBottom: '1em'}}>
                     <div>Select Week:</div>
-                    {
-                        weeks.map(week => (
-                            <Link key={week}
-                                  className={`week-option ${week === parseInt(currentWeek) ? 'current' : ''}`}
-                                  to={`/rankings/${week}`}>
-                                {week}
-                            </Link>
-                        ))
-                    }
+                    <div className="flex" style={{flexWrap: 'wrap', gap: '1em 2em'}}>
+                        {
+                            weeks.map(week => (
+                                <Link key={week}
+                                      className={`week-option ${week === parseInt(currentWeek) ? 'current' : ''}`}
+                                      to={`/rankings/${week}`}>
+                                    {week}
+                                </Link>
+                            ))
+                        }
+                    </div>
                 </div>
                 {
                     Object.entries(rankings).sort((aTeam, bTeam) => aTeam[1].ranking - bTeam[1].ranking)
