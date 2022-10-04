@@ -72,12 +72,12 @@ function Rankings(){
                               <div className="blurb-container" key={teamId}>
                                   <h2 className="flex align-center">
                                       {editorState.ranking}.
-                                      <div className="flex align-center" style={{marginLeft: '0.5em'}}>
+                                      <div className="flex align-center" style={{marginLeft: '0.25em'}}>
                                           {teams[teamId]?.avatar ?
                                               <img src={teams[teamId]?.avatar} className="avatar"
                                                    alt="avatar"/> : null}
                                           <div>
-                                              <span>{teams[teamId]?.teamName}</span>
+                                              <span style={{fontSize: '0.92em'}}>{teams[teamId]?.teamName}</span>
                                               <div className="team-name">{teams[teamId]?.displayName}</div>
                                           </div>
                                       </div>
