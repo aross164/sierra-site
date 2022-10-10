@@ -109,7 +109,7 @@ function Trades(){
                 timeZone: "America/Chicago",
                 weekday: 'long'
             });
-            if(dayName === 'Tuesday'){ // sleeper counts tuesday as previous week
+            if(['Monday', 'Tuesday'].includes(dayName)){ // really need to see if players already played before trade
                 week++;
             }
 

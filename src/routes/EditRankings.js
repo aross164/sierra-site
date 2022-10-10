@@ -90,10 +90,6 @@ function EditRankings({week}){
         }, 1500);
     }
 
-    /*if(newestWeek - week > 1){
-        return <h1>Rankings for Week {week} are locked</h1>
-    }*/
-
     if(!Object.keys(editorStates).length){
         return <div>Loading</div>;
     }
