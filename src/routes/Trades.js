@@ -69,7 +69,7 @@ function Trades(){
                                 return;
                             }
                             numWeeks++;
-                            totalPoints += weekStats.stats.pts_ppr;
+                            totalPoints += weekStats.stats.pts_ppr || 0;
                         });
                         if(numWeeks){
                             add.points = totalPoints;
@@ -168,10 +168,9 @@ function Trades(){
                                                                                <div className="flex justify-center">
                                                                                    <div>
                                                                                        <span>{players[playerId].first_name} {players[playerId].last_name}</span>
-                                                                                       <div className="flex trade-player-info"
-                                                                                            style={{justifyContent: 'space-between'}}>
+                                                                                       <div className="trade-player-info">
                                                                                            <span>{players[playerId].position}</span>
-                                                                                           <span>{players[playerId].team}</span>
+                                                                                           <span className="trade-player-info-team">{players[playerId].team}</span>
                                                                                        </div>
                                                                                    </div>
                                                                                </div>

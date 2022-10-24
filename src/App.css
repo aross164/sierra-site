@@ -149,6 +149,19 @@ footer a {
 
 .trade-player-info{
     font-size: 0.8em;
+    text-align: center;
+}
+
+.trade-player-info-separator{
+    margin: 0 0.375em;
+    font-weight: bold;
+}
+
+.trade-player-info-team{
+    --spacing: 0.3125em;
+    border-left: 2px solid black;
+    padding-left: var(--spacing);
+    margin-left: var(--spacing);
 }
 
 .editor-area{
@@ -182,5 +195,11 @@ footer a {
 
     .editor-area{
         min-height: auto;
+    }
+}
+
+@media only screen and (max-width: 375px){
+    .trade-container td{
+        font-size: 0.88em;
     }
 }
