@@ -30,6 +30,7 @@ function App(){
     const [teams, setTeams] = useState({});
     const [newestWeek, setNewestWeek] = useState(0);
     const [allRankings, setAllRankings] = useState([]);
+    const [scores, setScores] = useState({});
     const location = useLocation();
 
     useEffect(() => {
@@ -70,10 +71,10 @@ function App(){
     }
 
     return (
-        <AppContext.Provider value={{league, newestWeek, teams, allRankings, rankingsRef}}>
+        <AppContext.Provider value={{league, newestWeek, teams, allRankings, rankingsRef, scores, setScores}}>
             <div className="app">
                 <Outlet/>
-                <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                <br/><br/><br/><br/><br/><br/><br/><br/><br/>
             </div>
             <footer>
                 <Link to="/" className="footerPage">
@@ -92,6 +93,19 @@ function App(){
                             <div>Trades</div>
                             {
                                 location.pathname === '/trades' && <div className="activePage"/>
+                            }
+                        </Link>
+                    </>
+                }
+                {
+                    <>
+                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                        </div>
+                        <Link to="/schedules" className="footerPage">
+                            <div>Schedules</div>
+                            {
+                                location.pathname === '/schedules' && <div className="activePage"/>
                             }
                         </Link>
                     </>

@@ -113,7 +113,7 @@ p{
     padding-bottom: 0;
 }
 
-footer {
+footer{
     height: 3rem;
     background-color: black;
     width: 100vw;
@@ -126,11 +126,11 @@ footer {
     font-weight: bold;
 }
 
-footer a {
+footer a{
     color: white;
 }
 
-.footerPage {
+.footerPage{
     cursor: pointer;
     flex: 1;
     height: 100%;
@@ -196,6 +196,41 @@ footer a {
     .editor-area{
         min-height: auto;
     }
+}
+
+.schedules{
+    border-collapse: collapse;
+}
+
+.schedules :is(td, th){
+    text-align: center;
+}
+
+.schedules :is(td, th){
+    padding: 0.25em;
+    border: 1px solid black
+}
+
+.schedules th{
+    padding-bottom: 0;
+}
+
+.schedules .same{
+    background-color: lightgoldenrodyellow;
+}
+
+.schedules .more {
+    background-color: lightgreen;
+}
+
+.schedules .less {
+    background-color: lightpink;
+}
+
+.schedules :is(td:first-child, th:first-child){
+    left: 0;
+    position: sticky;
+    background-color: white;
 }
 
 @media only screen and (max-width: 375px){

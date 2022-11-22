@@ -9,6 +9,7 @@ import {
 import EditRankings from './routes/EditRankings';
 import Rankings from './routes/Rankings';
 import Trades from './routes/Trades';
+import Schedules from './routes/Schedules';
 
 const router = createBrowserRouter([
     {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
             {
                 path: 'trades',
                 element: <Trades />
+            },
+            {
+                path: 'schedules',
+                element: <Schedules />
             },
             {
                 path: 'angry',
