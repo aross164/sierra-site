@@ -3,8 +3,14 @@ import AppContext from '../contexts/AppContext';
 
 function Trades(){
     const {newestWeek, league, teams} = useContext(AppContext);
+
+    if(league && league !== '855884259620188160'){
+        window.location.replace(`${window.location.origin}/schedules?league=${league}`)
+    }
+
     const [trades, setTrades] = useState([]);
     const [players, setPlayers] = useState({});
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if(!newestWeek){
@@ -90,6 +96,7 @@ function Trades(){
             }, {});
 
             setTrades(groupedTrades);
+            setLoading(false);
         }
 
         async function fetchPlayer(playerId){
@@ -119,8 +126,12 @@ function Trades(){
         fetchTrades();
     }, [newestWeek, league]);
 
-    if(!Object.keys(trades).length){
+    if(loading){
         return <div>Loading</div>;
+    }
+
+    if(!Object.keys(trades).length){
+        return <div>No trades</div>;
     }
 
     return (
@@ -170,7 +181,8 @@ function Trades(){
                                                                                        <span>{players[playerId].first_name} {players[playerId].last_name}</span>
                                                                                        <div className="trade-player-info">
                                                                                            <span>{players[playerId].position}</span>
-                                                                                           <span className="trade-player-info-team">{players[playerId].team}</span>
+                                                                                           <span
+                                                                                               className="trade-player-info-team">{players[playerId].team}</span>
                                                                                        </div>
                                                                                    </div>
                                                                                </div>

@@ -5,7 +5,10 @@ import {convertFromRaw} from 'draft-js';
 import {stateToHTML} from 'draft-js-export-html';
 
 function Rankings(){
-    const {newestWeek, teams, allRankings} = useContext(AppContext);
+    const {newestWeek, teams, allRankings, league} = useContext(AppContext);
+    if(league && league !== '855884259620188160'){
+        window.location.replace(`${window.location.origin}/schedules?league=${league}`)
+    }
     let {week: currentWeek} = useParams();
 
     if(!currentWeek){

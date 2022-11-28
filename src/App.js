@@ -24,20 +24,31 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const rankingsRef = ref(db, 'rankings');
 
-const league = '855884259620188160';
-
 function App(){
     const [teams, setTeams] = useState({});
     const [newestWeek, setNewestWeek] = useState(0);
     const [allRankings, setAllRankings] = useState([]);
     const [scores, setScores] = useState({});
+    const [league, setLeague] = useState('');
     const location = useLocation();
 
     useEffect(() => {
+        if(!location){
+            return;
+        }
+        setLeague(new URLSearchParams(location.search).get('league') || '855884259620188160');
+    }, [location]);
+
+    useEffect(() => {
+        if(!league){
+            return;
+        }
+
         fetchTeams();
         fetchRankings();
         fetchWeek();
-    }, []);
+        // eslint-disable-next-line
+    }, [league]);
 
     async function fetchTeams(){
         const usersResponse = await fetch(`https://api.sleeper.app/v1/league/${league}/users`);
@@ -77,39 +88,37 @@ function App(){
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/>
             </div>
             <footer>
-                <Link to="/" className="footerPage">
-                    <div>Rankings</div>
+                {
+                    league === '855884259620188160' ?
+                        <>
+                            <Link to="/" className="footerPage">
+                                <div>Rankings</div>
+                                {
+                                    (location.pathname === '/' || location.pathname.includes('rankings')) &&
+                                    <div className="activePage"/>
+                                }
+                            </Link>
+                            <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                                <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                            </div>
+                            <Link to={`/trades?league=${league}`} className="footerPage">
+                                <div>Trades</div>
+                                {
+                                    location.pathname === '/trades' && <div className="activePage"/>
+                                }
+                            </Link>
+                            <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                                <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                            </div>
+                        </>
+                        : null
+                }
+                <Link to={`/schedules?league=${league}`} className="footerPage">
+                    <div>Schedules</div>
                     {
-                        (location.pathname === '/' || location.pathname.includes('rankings')) &&
-                        <div className="activePage"/>
+                        location.pathname === '/schedules' && <div className="activePage"/>
                     }
                 </Link>
-                {
-                    <>
-                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
-                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
-                        </div>
-                        <Link to="/trades" className="footerPage">
-                            <div>Trades</div>
-                            {
-                                location.pathname === '/trades' && <div className="activePage"/>
-                            }
-                        </Link>
-                    </>
-                }
-                {
-                    <>
-                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
-                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
-                        </div>
-                        <Link to="/schedules" className="footerPage">
-                            <div>Schedules</div>
-                            {
-                                location.pathname === '/schedules' && <div className="activePage"/>
-                            }
-                        </Link>
-                    </>
-                }
             </footer>
         </AppContext.Provider>
     );

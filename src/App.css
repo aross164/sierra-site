@@ -233,6 +233,12 @@ footer a{
     background-color: white;
 }
 
+.schedules .grid-team{
+    max-width: 3.5em;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 @media only screen and (max-width: 375px){
     .trade-container td{
         font-size: 0.88em;
