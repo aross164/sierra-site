@@ -219,11 +219,11 @@ footer a{
     background-color: lightgoldenrodyellow;
 }
 
-.schedules .more {
+.schedules .more{
     background-color: lightgreen;
 }
 
-.schedules .less {
+.schedules .less{
     background-color: lightpink;
 }
 
@@ -237,6 +237,20 @@ footer a{
     max-width: 3.5em;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.table-title h2{
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+
+.table-title .clarification{
+    margin-top: -0.3125em;
+    margin-bottom: 0.375em;
+}
+
+.table-title .clarification span{
+    font-size: 0.875em;
 }
 
 @media only screen and (max-width: 375px){

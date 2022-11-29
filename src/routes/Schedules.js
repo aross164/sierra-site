@@ -83,16 +83,14 @@ function Trades(){
                 const {wins, losses, ties} = getRecord(rowRosterId, columnRosterId);
                 newWhatIfScores[rowRosterId].records[columnRosterId] = {wins, losses, ties};
 
-                if(rowRosterId !== columnRosterId){
-                    totalWins += wins;
-                    totalLosses += losses;
-                    totalTies += ties;
-                }
+                totalWins += wins;
+                totalLosses += losses;
+                totalTies += ties;
             });
             newWhatIfScores[rowRosterId].trueRecord = {
-                wins: (totalWins / 11).toFixed(1),
-                losses: (totalLosses / 11).toFixed(1),
-                ties: (totalTies / 11).toFixed(1),
+                wins: (totalWins / 12).toFixed(1),
+                losses: (totalLosses / 12).toFixed(1),
+                ties: (totalTies / 12).toFixed(1),
             };
         });
 
@@ -101,17 +99,13 @@ function Trades(){
             let totalLosses = 0;
             let totalTies = 0;
             Object.keys(teamData.records).forEach(otherRosterId => {
-                if(teamRosterId === otherRosterId){
-                    return;
-                }
-
                 totalWins += newWhatIfScores[otherRosterId].records[teamRosterId].wins;
                 totalLosses += newWhatIfScores[otherRosterId].records[teamRosterId].losses;
                 totalTies += newWhatIfScores[otherRosterId].records[teamRosterId].ties;
             });
-            const wins = (totalWins / 11).toFixed(1);
-            const losses = (totalLosses / 11).toFixed(1);
-            let ties = (totalTies / 11).toFixed(1);
+            const wins = (totalWins / 12).toFixed(1);
+            const losses = (totalLosses / 12).toFixed(1);
+            let ties = (totalTies / 12).toFixed(1);
             if(ties === '0.0'){
                 ties = null;
             }
@@ -190,7 +184,10 @@ function Trades(){
                 </tbody>
             </table>
         </div>
-        <h2 style={{marginTop: '1em'}}>True Records</h2>
+        <div className="table-title">
+            <h2>True Records</h2>
+            <div className="clarification"><span>* Average record from playing all schedules</span></div>
+        </div>
         <table className="schedules">
             <tbody>
             {Object.entries(whatIfScores).sort((a, b) => b[1].trueRecord.wins - a[1].trueRecord.wins)
@@ -209,7 +206,10 @@ function Trades(){
                    })}
             </tbody>
         </table>
-        <h2 style={{marginTop: '1em'}}>Hardest Schedules</h2>
+        <div className="table-title">
+            <h2>Hardest Schedules</h2>
+            <div className="clarification"><span>* Average record with team's schedule</span></div>
+        </div>
         <table className="schedules">
             <tbody>
             {Object.entries(whatIfScores).sort((a, b) => a[1].avgRecord.wins - b[1].avgRecord.wins)
