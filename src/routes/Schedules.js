@@ -6,7 +6,8 @@ function Schedules(){
     const [leagues, setLeagues] = useState(JSON.parse(localStorage.getItem('leagues')) || {});
     const [newLeagueId, setNewLeagueId] = useState('');
     const [loadingText, setLoadingText] = useState('Loading...');
-    const [leagueInfo, setLeagueInfo] = useState(leagues[league]);
+
+    const leagueInfo = leagues && leagues[league];
 
     let nameMap = {
         rossAlex: 'AlR',
@@ -166,11 +167,9 @@ function Schedules(){
                 }
                 const {league_id, name, total_rosters} = await response.json();
                 const newLeagues = {...leagues};
-                const newLeague = {league_id, name, total_rosters};
-                newLeagues[league] = newLeague;
+                newLeagues[league] = {league_id, name, total_rosters};
                 localStorage.setItem('leagues', JSON.stringify(newLeagues));
                 setLeagues(newLeagues);
-                setLeagueInfo(newLeague)
             })();
         }
     }, [league, leagues]);
