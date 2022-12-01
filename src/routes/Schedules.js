@@ -6,6 +6,7 @@ function Schedules(){
     const [leagues, setLeagues] = useState(JSON.parse(localStorage.getItem('leagues')) || {});
     const [newLeagueId, setNewLeagueId] = useState('');
     const [loadingText, setLoadingText] = useState('Loading...');
+    const [leagueInfo, setLeagueInfo] = useState(leagues[league]);
 
     let nameMap = {
         rossAlex: 'AlR',
@@ -78,7 +79,7 @@ function Schedules(){
     }, [newestWeek, teams, league, setScores]);
 
     useEffect(() => {
-        if(!Object.keys(scores).length){
+        if(!Object.keys(scores).length || !leagueInfo?.total_rosters){
             return;
         }
 
@@ -100,9 +101,9 @@ function Schedules(){
                 totalTies += ties;
             });
             newWhatIfScores[rowRosterId].trueRecord = {
-                wins: (totalWins / 12).toFixed(1),
-                losses: (totalLosses / 12).toFixed(1),
-                ties: (totalTies / 12).toFixed(1),
+                wins: (totalWins / leagueInfo.total_rosters).toFixed(1),
+                losses: (totalLosses / leagueInfo.total_rosters).toFixed(1),
+                ties: (totalTies / leagueInfo.total_rosters).toFixed(1),
             };
         });
 
@@ -115,9 +116,9 @@ function Schedules(){
                 totalLosses += newWhatIfScores[otherRosterId].records[teamRosterId].losses;
                 totalTies += newWhatIfScores[otherRosterId].records[teamRosterId].ties;
             });
-            const wins = (totalWins / 12).toFixed(1);
-            const losses = (totalLosses / 12).toFixed(1);
-            let ties = (totalTies / 12).toFixed(1);
+            const wins = (totalWins / leagueInfo.total_rosters).toFixed(1);
+            const losses = (totalLosses / leagueInfo.total_rosters).toFixed(1);
+            let ties = (totalTies / leagueInfo.total_rosters).toFixed(1);
             if(ties === '0.0'){
                 ties = null;
             }
@@ -149,25 +150,27 @@ function Schedules(){
 
             return {wins, losses, ties};
         }
-    }, [scores, newestWeek]);
+    }, [scores, newestWeek, leagueInfo]);
 
     useEffect(() => {
         if(!league){
             return;
         }
 
-        if(!leagues || !leagues[league]){
+        if(!leagues || !leagues[league]?.total_rosters){
             (async () => {
                 const response = await fetch(`https://api.sleeper.app/v1/league/${league}`);
                 if(response.status === 404){
                     setLoadingText(`Invalid League ID: ${league}`)
                     return;
                 }
-                const {league_id, name} = await response.json();
+                const {league_id, name, total_rosters} = await response.json();
                 const newLeagues = {...leagues};
-                newLeagues[league] = {league_id, name};
+                const newLeague = {league_id, name, total_rosters};
+                newLeagues[league] = newLeague;
                 localStorage.setItem('leagues', JSON.stringify(newLeagues));
                 setLeagues(newLeagues);
+                setLeagueInfo(newLeague)
             })();
         }
     }, [league, leagues]);
