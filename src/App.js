@@ -87,39 +87,37 @@ function App(){
                 <Outlet/>
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/>
             </div>
-            <footer>
-                {
-                    league === '855884259620188160' ?
-                        <>
-                            <Link to="/" className="footerPage">
-                                <div>Rankings</div>
-                                {
-                                    (location.pathname === '/' || location.pathname.includes('rankings')) &&
-                                    <div className="activePage"/>
-                                }
-                            </Link>
-                            <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
-                                <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
-                            </div>
-                            <Link to={`/trades?league=${league}`} className="footerPage">
-                                <div>Trades</div>
-                                {
-                                    location.pathname === '/trades' && <div className="activePage"/>
-                                }
-                            </Link>
-                            <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
-                                <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
-                            </div>
-                        </>
-                        : null
-                }
-                <Link to={`/schedules?league=${league}`} className="footerPage">
-                    <div>Schedules</div>
-                    {
-                        location.pathname === '/schedules' && <div className="activePage"/>
-                    }
-                </Link>
-            </footer>
+            {
+                league === '855884259620188160' ?
+                    <footer>
+                        <Link to="/" className="footerPage">
+                            <div>Rankings</div>
+                            {
+                                (location.pathname === '/' || location.pathname.includes('rankings')) &&
+                                <div className="activePage"/>
+                            }
+                        </Link>
+                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                        </div>
+                        <Link to={`/trades?league=${league}`} className="footerPage">
+                            <div>Trades</div>
+                            {
+                                location.pathname === '/trades' && <div className="activePage"/>
+                            }
+                        </Link>
+                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                        </div>
+                        <Link to={`/schedules?league=${league}`} className="footerPage">
+                            <div>Schedules</div>
+                            {
+                                location.pathname === '/schedules' && <div className="activePage"/>
+                            }
+                        </Link>
+                    </footer>
+                    : null
+            }
         </AppContext.Provider>
     );
 }

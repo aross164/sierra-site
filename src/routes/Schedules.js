@@ -1,8 +1,11 @@
 import React, {useEffect, useContext, useState} from 'react';
 import AppContext from '../contexts/AppContext';
 
-function Trades(){
+function Schedules(){
     const {newestWeek, teams, league, scores, setScores} = useContext(AppContext);
+    const [leagues, setLeagues] = useState(JSON.parse(localStorage.getItem('leagues')) || {});
+    const [newLeagueId, setNewLeagueId] = useState('');
+    const [loadingText, setLoadingText] = useState('Loading...');
 
     let nameMap = {
         rossAlex: 'AlR',
@@ -23,6 +26,15 @@ function Trades(){
     }
 
     const [whatIfScores, setWhatIfScores] = useState({});
+
+    function goToLeague(){
+        if(!newLeagueId || isNaN(newLeagueId)){
+            alert('League ID must be a number');
+            return;
+        }
+
+        window.location.replace(`${window.location.origin}/schedules?league=${newLeagueId}`);
+    }
 
     useEffect(() => {
         if(!newestWeek || !Object.keys(teams).length){
@@ -139,12 +151,53 @@ function Trades(){
         }
     }, [scores, newestWeek]);
 
-    if(!Object.keys(whatIfScores).length){
-        return <div>Loading...</div>;
+    useEffect(() => {
+        if(!league){
+            return;
+        }
+
+        if(!leagues || !leagues[league]){
+            (async () => {
+                const response = await fetch(`https://api.sleeper.app/v1/league/${league}`);
+                if(response.status === 404){
+                    setLoadingText(`Invalid League ID: ${league}`)
+                    return;
+                }
+                const {league_id, name} = await response.json();
+                const newLeagues = {...leagues};
+                newLeagues[league] = {league_id, name};
+                localStorage.setItem('leagues', JSON.stringify(newLeagues));
+                setLeagues(newLeagues);
+            })();
+        }
+    }, [league, leagues]);
+
+    if(!Object.keys(whatIfScores).length || !leagues){
+        return <div>{loadingText}</div>;
     }
 
     return (<div>
-        <h1>Schedules</h1>
+        <h1 style={{marginBottom: 0}}>Schedules</h1>
+        <div>
+            <label htmlFor="league">League: </label>
+            <select defaultValue={league} id="league"
+                    onChange={e => window.location.replace(`${window.location.origin}/schedules?league=${e.target.value}`)}>
+                {
+                    Object.entries(leagues).map(([league_id, {name}]) => (
+                        <option key={league_id} value={league_id}>{name}</option>
+                    ))
+                }
+            </select>
+        </div>
+        <div style={{marginBottom: '1.33em'}}>
+            <label htmlFor="add-league">Add League: </label>
+            <input value={newLeagueId} onChange={e => setNewLeagueId(e.target.value)} type="number"
+                   placeholder="League ID"/>
+            <button
+                onClick={goToLeague}>
+                Go
+            </button>
+        </div>
         <h2>Grid</h2>
         <div style={{overflow: 'auto'}}>
             <table className="schedules">
@@ -161,7 +214,7 @@ function Trades(){
                 </tr>
                 </thead>
                 <tbody>
-                {Object.entries(whatIfScores).map(([rowRosterId, {actualWins, records, trueRecord}]) => {
+                {Object.entries(whatIfScores).map(([rowRosterId, {actualWins, records}]) => {
                     const team = Object.values(teams)
                                        .find(team => parseInt(team.rosterId) === parseInt(rowRosterId));
                     return (<tr key={rowRosterId}>
@@ -231,4 +284,4 @@ function Trades(){
     </div>);
 }
 
-export default Trades;
+export default Schedules;
