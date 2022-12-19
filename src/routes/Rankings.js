@@ -7,32 +7,51 @@ import {stateToHTML} from 'draft-js-export-html';
 function Rankings(){
     const {newestWeek, teams, allRankings, league} = useContext(AppContext);
     if(league && league !== '855884259620188160'){
-        window.location.replace(`${window.location.origin}/schedules?league=${league}`)
+        window.location.replace(`${window.location.origin}/schedules?league=${league}`);
     }
     let {week: currentWeek} = useParams();
 
-    if(!currentWeek){
-        currentWeek = newestWeek;
-    }
+    const [finalWeek, setFinalWeek] = useState(0);
 
+    if(!currentWeek){
+        currentWeek = finalWeek;
+
+    }
     const [rankings, setRankings] = useState({});
     const [weeks, setWeeks] = useState([]);
     // const [currentWeek, setCurrentWeek] = useState(0);
 
     useEffect(() => {
-        if(!newestWeek){
+        if(!finalWeek){
             return;
         }
 
         let i = 1;
         const newWeeks = [];
-        while (i <= newestWeek) {
+        while (i <= finalWeek) {
             newWeeks.push(i);
             i++;
         }
 
         setWeeks(newWeeks);
-    }, [newestWeek]);
+    }, [finalWeek]);
+
+    useEffect(() => {
+        if(!league || !newestWeek){
+            return;
+        }
+
+        (async () => {
+            const leagueInfoResponse = await fetch(`https://api.sleeper.app/v1/league/${league}`);
+            const {settings} = await leagueInfoResponse.json();
+            const playoffStart = settings.playoff_week_start;
+            if(newestWeek > playoffStart - 1){
+                setFinalWeek(playoffStart - 1);
+            } else{
+                setFinalWeek(newestWeek);
+            }
+        })();
+    }, [league, newestWeek]);
 
     useEffect(() => {
         if(!allRankings?.length){
@@ -62,7 +81,7 @@ function Rankings(){
                             weeks.map(week => (
                                 <Link key={week}
                                       className={`week-option ${week === parseInt(currentWeek) ? 'current' : ''}`}
-                                      to={`/rankings/${week}`}>
+                                      to={`/rankings/${week}?league=${league}`}>
                                     {week}
                                 </Link>
                             ))

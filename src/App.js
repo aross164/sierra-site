@@ -36,7 +36,7 @@ function App(){
         if(!location){
             return;
         }
-        setLeague(new URLSearchParams(location.search).get('league') || '855884259620188160');
+        setLeague(new URLSearchParams(location.search).get('league'));
     }, [location]);
 
     useEffect(() => {
@@ -90,7 +90,7 @@ function App(){
             {
                 league === '855884259620188160' ?
                     <footer>
-                        <Link to="/" className="footerPage">
+                        <Link to={`/rankings?league=${league}`} className="footerPage">
                             <div>Rankings</div>
                             {
                                 (location.pathname === '/' || location.pathname.includes('rankings')) &&

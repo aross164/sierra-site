@@ -5,7 +5,8 @@ function Schedules(){
     const {newestWeek, teams, league, scores, setScores} = useContext(AppContext);
     const [leagues, setLeagues] = useState(JSON.parse(localStorage.getItem('leagues')) || {});
     const [newLeagueId, setNewLeagueId] = useState('');
-    const [loadingText, setLoadingText] = useState('Loading...');
+    const [isInvalidLeague, setIsInvalidLeague] = useState(false);
+    const [positionSort, setPositionSort] = useState('QB');
 
     const leagueInfo = leagues && leagues[league];
 
@@ -55,22 +56,62 @@ function Schedules(){
                 if(!team.rosterId){
                     return initialized;
                 }
-                initialized[team.rosterId] = {};
+                initialized[team.rosterId] = {
+                    positionScores: {
+                        QB: {points: 0, numPlayers: 0},
+                        RB: {points: 0, numPlayers: 0},
+                        WR: {points: 0, numPlayers: 0},
+                        TE: {points: 0, numPlayers: 0},
+                        K: {points: 0, numPlayers: 0},
+                    }
+                };
                 return initialized;
             }, {});
+
+            const playerPositions = {};
 
             await Promise.all(weeks.map(async week => {
                 const response = await fetch(`https://api.sleeper.app/v1/league/${league}/matchups/${week}`);
                 const weekInfo = await response.json();
 
-                weekInfo.forEach((roster) => {
+                return await Promise.all(weekInfo.map(async roster => {
                     newScores[roster.roster_id][week] = {};
                     newScores[roster.roster_id][week].pf = roster.points;
 
                     const opponent = weekInfo.find(user => user.matchup_id === roster.matchup_id && user.roster_id !== roster.roster_id);
                     newScores[roster.roster_id][week].opponent = opponent.roster_id;
                     newScores[roster.roster_id][week].pa = opponent.points;
-                });
+
+                    return await Promise.all(roster.starters.map(async (starter, index) => {
+                        let position = playerPositions[starter];
+
+                        if(!position){
+                            if(index === 0){
+                                position = 'QB';
+                            } else if([1, 2].includes(index)){
+                                position = 'RB';
+                            } else if([3, 4].includes(index)){
+                                position = 'WR';
+                            } else if(index === 5){
+                                position = 'TE';
+                            } else if(index === 8){
+                                position = 'K';
+                            } else{
+                                const playerResponse = await fetch(`https://api.sleeper.com/players/nfl/${starter}`);
+                                const playerInfo = await playerResponse.json();
+                                position = playerInfo.position;
+                                playerPositions[starter] = position;
+                            }
+
+                            if(!position){
+                                alert(`Error getting position for ${starter}`);
+                            }
+                        }
+
+                        newScores[roster.roster_id].positionScores[position].numPlayers++;
+                        newScores[roster.roster_id].positionScores[position].points += roster.players_points[starter];
+                    }));
+                }));
             }));
 
             setScores(newScores);
@@ -162,7 +203,7 @@ function Schedules(){
             (async () => {
                 const response = await fetch(`https://api.sleeper.app/v1/league/${league}`);
                 if(response.status === 404){
-                    setLoadingText(`Invalid League ID: ${league}`)
+                    setIsInvalidLeague(true);
                     return;
                 }
                 const {league_id, name, total_rosters} = await response.json();
@@ -174,8 +215,30 @@ function Schedules(){
         }
     }, [league, leagues]);
 
-    if(!Object.keys(whatIfScores).length || !leagues){
-        return <div>{loadingText}</div>;
+    if(isInvalidLeague || league === null){
+        return (<>
+            <h2 style={{textAlign: 'center', marginBottom: '1em'}}>Invalid League ID</h2>
+            <div style={{marginBottom: '0.5em'}}>To Find league ID in Sleeper app:</div>
+            <div style={{display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1em'}}>
+                <span style={{whiteSpace: 'nowrap'}}>"LEAGUE" tab -></span>
+                <div style={{whiteSpace: 'nowrap', display: 'flex', alignItems: 'center'}}>
+                    <img alt="settings-icon" src="/images/cog.png" style={{height: '24px', width: '24px'}}/>
+                    <span>-> General -></span>
+                </div>
+                <span style={{whiteSpace: 'nowrap'}}>"COPY LEAGUE ID"</span>
+            </div>
+            <label htmlFor="add-league">Add League: </label>
+            <input value={newLeagueId} onChange={e => setNewLeagueId(e.target.value)} type="number"
+                   placeholder="League ID"/>
+            <button
+                onClick={goToLeague}>
+                Go
+            </button>
+        </>);
+    }
+
+    if(!Object.keys(scores).length || !Object.keys(whatIfScores).length || !leagues){
+        return <div>Loading...</div>;
     }
 
     return (<div>
@@ -184,11 +247,8 @@ function Schedules(){
             <label htmlFor="league">League: </label>
             <select defaultValue={league} id="league"
                     onChange={e => window.location.replace(`${window.location.origin}/schedules?league=${e.target.value}`)}>
-                {
-                    Object.entries(leagues).map(([league_id, {name}]) => (
-                        <option key={league_id} value={league_id}>{name}</option>
-                    ))
-                }
+                {Object.entries(leagues)
+                       .map(([league_id, {name}]) => (<option key={league_id} value={league_id}>{name}</option>))}
             </select>
         </div>
         <div style={{marginBottom: '1.33em'}}>
@@ -280,6 +340,46 @@ function Schedules(){
                                {wins}&nbsp;-&nbsp;{losses}{ties ? <span>&nbsp;-&nbsp;{ties}</span> : null}
                            </td>
                        </tr>;
+                   })}
+            </tbody>
+        </table>
+        <div className="table-title">
+            <h2>Avg. Per Position</h2>
+            <div className="clarification"><span>* tap position name to sort</span></div>
+        </div>
+        <table className="schedules">
+            <thead>
+            <tr>
+                <th>Team</th>
+                <th style={{cursor: 'pointer', fontWeight: positionSort === 'QB' ? 'bold' : 'normal'}}
+                    onClick={() => setPositionSort('QB')}>QB
+                </th>
+                <th style={{cursor: 'pointer', fontWeight: positionSort === 'RB' ? 'bold' : 'normal'}}
+                    onClick={() => setPositionSort('RB')}>RB
+                </th>
+                <th style={{cursor: 'pointer', fontWeight: positionSort === 'WR' ? 'bold' : 'normal'}}
+                    onClick={() => setPositionSort('WR')}>WR
+                </th>
+                <th style={{cursor: 'pointer', fontWeight: positionSort === 'TE' ? 'bold' : 'normal'}}
+                    onClick={() => setPositionSort('TE')}>TE
+                </th>
+                <th style={{cursor: 'pointer', fontWeight: positionSort === 'K' ? 'bold' : 'normal'}}
+                    onClick={() => setPositionSort('K')}>K
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {Object.entries(scores)
+                   .sort((a, b) => b[1].positionScores[positionSort].points / b[1].positionScores[positionSort].numPlayers - a[1].positionScores[positionSort].points / a[1].positionScores[positionSort].numPlayers)
+                   .map(([rowRosterId, {positionScores}]) => {
+                       const team = Object.values(teams)
+                                          .find(team => parseInt(team.rosterId) === parseInt(rowRosterId));
+                       const order = ['QB', 'RB', 'WR', 'TE', 'K'];
+                       return (<tr key={rowRosterId}>
+                           <td style={{textAlign: 'left'}}>{nameMap[team.displayName] || (team.teamName || team.displayName)}</td>
+                           {order.map(position => (
+                               <td key={position}>{(positionScores[position].points / positionScores[position].numPlayers).toFixed(1)}</td>))}
+                       </tr>);
                    })}
             </tbody>
         </table>

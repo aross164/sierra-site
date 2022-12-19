@@ -11,6 +11,16 @@ import Rankings from './routes/Rankings';
 import Trades from './routes/Trades';
 import Schedules from './routes/Schedules';
 
+function sierraLoader({request}){
+    const url = new URL(request.url);
+    const league = url.searchParams.get('league');
+    if(!league){
+        return window.location.replace(`${request.url}?league=855884259620188160`);
+    }
+
+    return {};
+}
+
 const router = createBrowserRouter([
     {
         path: "/",
@@ -18,8 +28,12 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                redirect: '/rankings',
-                element: <Rankings/>
+                element: <Schedules/>
+            },
+            {
+                path: 'rankings',
+                element: <Rankings/>,
+                loader: sierraLoader
             },
             {
                 path: 'rankings/:week',
@@ -27,71 +41,86 @@ const router = createBrowserRouter([
             },
             {
                 path: 'trades',
-                element: <Trades />
+                element: <Trades/>
             },
             {
                 path: 'schedules',
-                element: <Schedules />
+                element: <Schedules/>
             },
             {
                 path: 'angry',
-                element: <EditRankings week={1}/>
+                element: <EditRankings week={1}/>,
+                loader: sierraLoader
             },
             {
                 path: 'boring',
-                element: <EditRankings week={2}/>
+                element: <EditRankings week={2}/>,
+                loader: sierraLoader
             },
             {
                 path: 'cash',
-                element: <EditRankings week={3}/>
+                element: <EditRankings week={3}/>,
+                loader: sierraLoader
             },
             {
                 path: 'dance',
-                element: <EditRankings week={4}/>
+                element: <EditRankings week={4}/>,
+                loader: sierraLoader
             },
             {
                 path: 'eager',
-                element: <EditRankings week={5}/>
+                element: <EditRankings week={5}/>,
+                loader: sierraLoader
             },
             {
                 path: 'face',
-                element: <EditRankings week={6}/>
+                element: <EditRankings week={6}/>,
+                loader: sierraLoader
             },
             {
                 path: 'girl',
-                element: <EditRankings week={7}/>
+                element: <EditRankings week={7}/>,
+                loader: sierraLoader
             },
             {
                 path: 'hamper',
-                element: <EditRankings week={8}/>
+                element: <EditRankings week={8}/>,
+                loader: sierraLoader
             },
             {
                 path: 'idle',
-                element: <EditRankings week={9}/>
+                element: <EditRankings week={9}/>,
+                loader: sierraLoader
             },
             {
                 path: 'jumper',
-                element: <EditRankings week={10}/>
+                element: <EditRankings week={10}/>,
+                loader: sierraLoader
             },
             {
                 path: 'kid',
-                element: <EditRankings week={11}/>
+                element: <EditRankings week={11}/>,
+                loader: sierraLoader
             },
             {
                 path: 'looker',
-                element: <EditRankings week={12}/>
+                element: <EditRankings week={12}/>,
+                loader: sierraLoader
             },
             {
                 path: 'mount',
-                element: <EditRankings week={13}/>
+                element: <EditRankings week={13}/>,
+                loader: sierraLoader
             },
             {
                 path: 'nail',
-                element: <EditRankings week={14}/>
+                element: <EditRankings week={14}/>,
+                loader: sierraLoader
             },
             {
                 path: 'oasis',
-                element: <EditRankings week={15}/>
+                element: <EditRankings week={15}/>,
+                loader: sierraLoader
             },
         ]
     }
