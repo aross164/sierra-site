@@ -47,7 +47,7 @@ function Schedules(){
         async function fetchScores(){
             const weeks = [];
             let i = 0;
-            while (i <= (newestWeek - 1)) {
+            while (i <= (newestWeek)) {
                 weeks.push(i);
                 i++;
             }
@@ -174,7 +174,7 @@ function Schedules(){
             let wins = 0;
             let losses = 0;
             let ties = 0;
-            while (i <= newestWeek - 1) {
+            while (i <= newestWeek) {
                 const forPoints = scores[rowRosterId][i].pf;
                 // column's points against unless it's the row user, then it's points for
                 const againstPoints = parseInt(scores[columnRosterId][i].opponent) !== parseInt(rowRosterId) ? scores[columnRosterId][i].pa : scores[columnRosterId][i].pf;

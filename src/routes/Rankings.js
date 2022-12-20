@@ -11,47 +11,27 @@ function Rankings(){
     }
     let {week: currentWeek} = useParams();
 
-    const [finalWeek, setFinalWeek] = useState(0);
-
     if(!currentWeek){
-        currentWeek = finalWeek;
-
+        currentWeek = newestWeek;
     }
     const [rankings, setRankings] = useState({});
     const [weeks, setWeeks] = useState([]);
     // const [currentWeek, setCurrentWeek] = useState(0);
 
     useEffect(() => {
-        if(!finalWeek){
+        if(!newestWeek){
             return;
         }
 
         let i = 1;
         const newWeeks = [];
-        while (i <= finalWeek) {
+        while (i <= newestWeek) {
             newWeeks.push(i);
             i++;
         }
 
         setWeeks(newWeeks);
-    }, [finalWeek]);
-
-    useEffect(() => {
-        if(!league || !newestWeek){
-            return;
-        }
-
-        (async () => {
-            const leagueInfoResponse = await fetch(`https://api.sleeper.app/v1/league/${league}`);
-            const {settings} = await leagueInfoResponse.json();
-            const playoffStart = settings.playoff_week_start;
-            if(newestWeek > playoffStart - 1){
-                setFinalWeek(playoffStart - 1);
-            } else{
-                setFinalWeek(newestWeek);
-            }
-        })();
-    }, [league, newestWeek]);
+    }, [newestWeek]);
 
     useEffect(() => {
         if(!allRankings?.length){

@@ -76,9 +76,27 @@ function App(){
     }
 
     async function fetchWeek(){
-        const response = await fetch('https://api.sleeper.app/v1/state/nfl');
-        const weekInfo = await response.json();
-        setNewestWeek(weekInfo.week);
+        async function fetchNflWeek(){
+            const response = await fetch('https://api.sleeper.app/v1/state/nfl');
+            const weekInfo = await response.json();
+            return weekInfo.week;
+        }
+        async function fetchPlayoffStart(){
+            const leagueInfoResponse = await fetch(`https://api.sleeper.app/v1/league/${league}`);
+            const {settings} = await leagueInfoResponse.json();
+            return settings.playoff_week_start;
+        }
+
+        const nflWeekPromise = fetchNflWeek();
+        const playoffStartPromise = fetchPlayoffStart();
+
+        const [nflWeek, playoffStart] = await Promise.all([nflWeekPromise, playoffStartPromise]);
+
+        if(nflWeek > playoffStart - 1){
+            setNewestWeek(playoffStart - 1);
+        } else{
+            setNewestWeek(nflWeek);
+        }
     }
 
     return (
