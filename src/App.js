@@ -87,7 +87,7 @@ function App(){
             return settings.playoff_week_start;
         }
 
-        const nflWeekPromise = fetchNflWeek();
+       /* const nflWeekPromise = fetchNflWeek();
         const playoffStartPromise = fetchPlayoffStart();
 
         const [nflWeek, playoffStart] = await Promise.all([nflWeekPromise, playoffStartPromise]);
@@ -96,7 +96,8 @@ function App(){
             setNewestWeek(playoffStart - 1);
         } else{
             setNewestWeek(nflWeek);
-        }
+        }*/
+        setNewestWeek(14);
     }
 
     return (
@@ -118,12 +119,12 @@ function App(){
                         <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
                             <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
                         </div>
-                        <Link to={`/trades?league=${league}`} className="footerPage">
+                        {/*<Link to={`/trades?league=${league}`} className="footerPage">
                             <div>Trades</div>
                             {
                                 location.pathname === '/trades' && <div className="activePage"/>
                             }
-                        </Link>
+                        </Link>*/}
                         <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
                             <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
                         </div>
