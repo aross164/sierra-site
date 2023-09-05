@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import './index.css';
 import App from './App';
 import {
@@ -15,7 +15,7 @@ function sierraLoader({request}){
     const url = new URL(request.url);
     const league = url.searchParams.get('league');
     if(!league){
-        return window.location.replace(`${request.url}?league=855884259620188160`);
+        window.location.replace(`${request.url}?league=989744511347666944`);
     }
 
     return {};
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: <Schedules/>
+                loader: () => window.location.pathname = '/schedules'
             },
             {
                 path: 'rankings',
@@ -126,9 +126,10 @@ const router = createBrowserRouter([
     }
 ]);
 
-const root = document.getElementById('root');
-ReactDOM.render(
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(
     <React.StrictMode>
         <RouterProvider router={router}/>
-    </React.StrictMode>, root
+    </React.StrictMode>
 );

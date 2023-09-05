@@ -15,7 +15,7 @@ function EditRankings({week}){
             return;
         }
 
-        const stringifiedNewRankings = allRankings[week];
+        const stringifiedNewRankings = allRankings?.[week];
         if(stringifiedNewRankings){
             const parsedEditorStates = Object.entries(stringifiedNewRankings).reduce((parsed, [teamId, state]) => {
                 const parsedState = JSON.parse(state);

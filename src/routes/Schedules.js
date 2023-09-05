@@ -2,7 +2,7 @@ import React, {useEffect, useContext, useState} from 'react';
 import AppContext from '../contexts/AppContext';
 
 function Schedules(){
-    const {newestWeek, teams, league, scores, setScores} = useContext(AppContext);
+    const {newestWeek, teams, league, scores, setScores, sierraId} = useContext(AppContext);
     const [leagues, setLeagues] = useState(JSON.parse(localStorage.getItem('leagues')) || {});
     const [newLeagueId, setNewLeagueId] = useState('');
     const [isInvalidLeague, setIsInvalidLeague] = useState(false);
@@ -24,7 +24,7 @@ function Schedules(){
         ChillBill96: 'WN',
         jgermash1: 'JG'
     };
-    if(league !== '855884259620188160'){
+    if(league !== sierraId){
         nameMap = {};
     }
 
@@ -174,7 +174,7 @@ function Schedules(){
             let wins = 0;
             let losses = 0;
             let ties = 0;
-            while (i <= newestWeek) {
+            while (i < newestWeek) {
                 const forPoints = scores[rowRosterId][i].pf;
                 // column's points against unless it's the row user, then it's points for
                 const againstPoints = parseInt(scores[columnRosterId][i].opponent) !== parseInt(rowRosterId) ? scores[columnRosterId][i].pa : scores[columnRosterId][i].pf;

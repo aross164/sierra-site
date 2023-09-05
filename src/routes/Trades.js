@@ -2,9 +2,9 @@ import React, {useContext, useEffect, useState} from 'react';
 import AppContext from '../contexts/AppContext';
 
 function Trades(){
-    const {newestWeek, league, teams} = useContext(AppContext);
+    const {newestWeek, league, teams, sierraId} = useContext(AppContext);
 
-    if(league && league !== '855884259620188160'){
+    if(league && league !== sierraId){
         window.location.replace(`${window.location.origin}/schedules?league=${league}`)
     }
 

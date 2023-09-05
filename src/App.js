@@ -22,7 +22,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const rankingsRef = ref(db, 'rankings');
+const rankingsRef = ref(db, 'rankings/2023');
+const sierraId = '989744511347666944';
 
 function App(){
     const [teams, setTeams] = useState({});
@@ -76,7 +77,7 @@ function App(){
     }
 
     async function fetchWeek(){
-        /*async function fetchNflWeek(){
+        async function fetchNflWeek(){
             const response = await fetch('https://api.sleeper.app/v1/state/nfl');
             const weekInfo = await response.json();
             return weekInfo.week;
@@ -85,9 +86,9 @@ function App(){
             const leagueInfoResponse = await fetch(`https://api.sleeper.app/v1/league/${league}`);
             const {settings} = await leagueInfoResponse.json();
             return settings.playoff_week_start;
-        }*/
+        }
 
-       /* const nflWeekPromise = fetchNflWeek();
+        const nflWeekPromise = fetchNflWeek();
         const playoffStartPromise = fetchPlayoffStart();
 
         const [nflWeek, playoffStart] = await Promise.all([nflWeekPromise, playoffStartPromise]);
@@ -96,18 +97,17 @@ function App(){
             setNewestWeek(playoffStart - 1);
         } else{
             setNewestWeek(nflWeek);
-        }*/
-        setNewestWeek(14);
+        }
     }
 
     return (
-        <AppContext.Provider value={{league, newestWeek, teams, allRankings, rankingsRef, scores, setScores}}>
+        <AppContext.Provider value={{league, newestWeek, teams, allRankings, rankingsRef, scores, setScores, sierraId}}>
             <div className="app">
                 <Outlet/>
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/>
             </div>
             {
-                league === '855884259620188160' ?
+                league === sierraId ?
                     <footer>
                         <Link to={`/rankings?league=${league}`} className="footerPage">
                             <div>Rankings</div>
@@ -119,12 +119,12 @@ function App(){
                         <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
                             <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
                         </div>
-                        {/*<Link to={`/trades?league=${league}`} className="footerPage">
+                        <Link to={`/trades?league=${league}`} className="footerPage">
                             <div>Trades</div>
                             {
                                 location.pathname === '/trades' && <div className="activePage"/>
                             }
-                        </Link>*/}
+                        </Link>
                         <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
                             <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
                         </div>
