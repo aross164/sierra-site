@@ -47,7 +47,7 @@ function Schedules(){
         async function fetchScores(){
             const weeks = [];
             let i = 0;
-            while (i <= (newestWeek)) {
+            while (i < (newestWeek)) {
                 weeks.push(i);
                 i++;
             }
