@@ -31,6 +31,7 @@ function App(){
     const [allRankings, setAllRankings] = useState([]);
     const [scores, setScores] = useState({});
     const [league, setLeague] = useState('');
+    const [season, setSeason] = useState('2023');
     const location = useLocation();
 
     useEffect(() => {
@@ -82,9 +83,12 @@ function App(){
             const weekInfo = await response.json();
             return weekInfo.week;
         }
+
         async function fetchPlayoffStart(){
             const leagueInfoResponse = await fetch(`https://api.sleeper.app/v1/league/${league}`);
-            const {settings} = await leagueInfoResponse.json();
+            const json = await leagueInfoResponse.json();
+            const {season: curSeason, settings} = json;
+            setSeason(curSeason);
             return settings.playoff_week_start;
         }
 
@@ -101,7 +105,8 @@ function App(){
     }
 
     return (
-        <AppContext.Provider value={{league, newestWeek, teams, allRankings, rankingsRef, scores, setScores, sierraId}}>
+        <AppContext.Provider
+            value={{league, newestWeek, teams, allRankings, rankingsRef, season, scores, setScores, sierraId}}>
             <div className="app">
                 <Outlet/>
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/>

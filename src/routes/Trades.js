@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import AppContext from '../contexts/AppContext';
 
 function Trades(){
-    const {newestWeek, league, teams, sierraId} = useContext(AppContext);
+    const {newestWeek, league, teams, sierraId, season} = useContext(AppContext);
 
     if(league && league !== sierraId){
         window.location.replace(`${window.location.origin}/schedules?league=${league}`)
@@ -101,7 +101,7 @@ function Trades(){
 
         async function fetchPlayer(playerId){
             const playerResponse = await fetch(`https://api.sleeper.com/players/nfl/${playerId}`);
-            const statsResponse = await fetch(`https://api.sleeper.com/stats/nfl/player/${playerId}?season_type=regular&season=2022&grouping=week`);
+            const statsResponse = await fetch(`https://api.sleeper.com/stats/nfl/player/${playerId}?season_type=regular&season=${season}&grouping=week`);
             const promises = await Promise.all([playerResponse, statsResponse]);
             const [playerData, statsData] = await Promise.all([promises[0].json(), promises[1].json()]);
             playerData.stats = statsData;
@@ -124,7 +124,7 @@ function Trades(){
         }
 
         fetchTrades();
-    }, [newestWeek, league]);
+    }, [newestWeek, league, season]);
 
     if(loading){
         return <div>Loading</div>;
