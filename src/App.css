@@ -253,6 +253,14 @@ footer a{
     font-size: 0.875em;
 }
 
+.blurb-container{
+    max-width: 91vw;
+}
+
+.blurb-container ul{
+    padding-left: 1.25em;
+}
+
 @media only screen and (max-width: 375px){
     .trade-container td{
         font-size: 0.88em;
