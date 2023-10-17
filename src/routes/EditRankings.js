@@ -82,9 +82,14 @@ function EditRankings({week}){
         };
 
         setSaveButtonText('Saving...');
-        await update(rankingsRef, newRankings);
-        setSaveButtonText('Updated!');
-        setSaved(true);
+        try {
+            await update(rankingsRef, newRankings);
+            setSaveButtonText('Updated!');
+            setSaved(true);
+        } catch (e) {
+            alert('Error saving. Try again or open in new tab.');
+        }
+
         setTimeout(() => {
             setSaveButtonText('Save');
         }, 1500);
@@ -106,8 +111,8 @@ function EditRankings({week}){
                                       {editorState.ranking}.
                                       <span className="flex align-center" style={{marginLeft: '0.25em'}}>
                                           {teams[teamId]?.avatar ?
-                                          <img src={teams[teamId]?.avatar} className="avatar"
-                                               alt="avatar"/> : null}
+                                              <img src={teams[teamId]?.avatar} className="avatar"
+                                                   alt="avatar"/> : null}
                                           <div>
                                               <span>{teams[teamId]?.teamName}</span>
                                               <div className="team-name">{teams[teamId]?.displayName}</div>
