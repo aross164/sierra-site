@@ -122,12 +122,12 @@ function EditRankings({week}){
                                       <div className="flex button-container" style={{gap: '0.5em'}}>
                                           {editorState.ranking !== 1 ?
                                               <div className="flex align-center">
-                                                  <button onClick={() => moveUp(teamId, editorState.ranking)}>Up
+                                                  <button onClick={() => moveUp(teamId, editorState.ranking)}>&uarr;
                                                   </button>
                                               </div> : null}
                                           {editorState.ranking !== 12 ? <div className="flex align-center">
                                               <button
-                                                  onClick={() => moveDown(teamId, editorState.ranking)}>Down
+                                                  onClick={() => moveDown(teamId, editorState.ranking)}>&darr;
                                               </button>
                                           </div> : null}
                                       </div>

@@ -124,6 +124,7 @@ footer{
     align-items: center;
     justify-content: space-around;
     font-weight: bold;
+    z-index: 1;
 }
 
 footer a{
