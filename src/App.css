@@ -175,6 +175,11 @@ figure{
     margin-bottom: 0.5em;
 }
 
+figure img{
+    object-fit: contain;
+    max-width: 100%;
+}
+
 @media only screen and (max-width: 450px){
     .break{
         margin: 0;
