@@ -60,9 +60,8 @@ function EditRankings({week}){
 
     function moveTeam(teamId, fromRanking, toRanking){
         const newEditorState = {...editorStates};
-        const displacedTeam = Object.entries(newEditorState)
-                                    .find(([displacedTeamId, team]) => team.ranking === toRanking);
-        const displacedTeamId = displacedTeam[0];
+        const displacedTeamId = Object.keys(newEditorState)
+                                    .find(teamId => newEditorState[teamId].ranking === toRanking);
         newEditorState[displacedTeamId].ranking = fromRanking;
         newEditorState[teamId].ranking = toRanking;
         setEditorStates(newEditorState);
