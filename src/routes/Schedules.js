@@ -57,13 +57,7 @@ function Schedules(){
                     return initialized;
                 }
                 initialized[team.rosterId] = {
-                    positionScores: {
-                        QB: {points: 0, numPlayers: 0},
-                        RB: {points: 0, numPlayers: 0},
-                        WR: {points: 0, numPlayers: 0},
-                        TE: {points: 0, numPlayers: 0},
-                        K: {points: 0, numPlayers: 0},
-                    }
+                    positionScores: {}
                 };
                 return initialized;
             }, {});
@@ -96,6 +90,8 @@ function Schedules(){
                                 position = 'TE';
                             } else if(index === 8){
                                 position = 'K';
+                            } else if(index === 9){
+                                position = 'DEF';
                             } else{
                                 const playerResponse = await fetch(`https://api.sleeper.com/players/nfl/${starter}`);
                                 const playerInfo = await playerResponse.json();
@@ -107,8 +103,18 @@ function Schedules(){
                                 alert(`Error getting position for ${starter}`);
                             }
                         }
+                        if(!['QB', 'RB', 'WR', 'TE', 'DEF', 'K'].includes(position)){
+                            position = 'IDP';
+                        }
 
+                        if(!newScores[roster.roster_id].positionScores[position]){
+                            newScores[roster.roster_id].positionScores[position] = {points: 0, numPlayers: 0};
+                        }
                         newScores[roster.roster_id].positionScores[position].numPlayers++;
+                        if(isNaN(roster.players_points[starter])){
+                            // I assume this means they left the sport empty
+                            return;
+                        }
                         newScores[roster.roster_id].positionScores[position].points += roster.players_points[starter];
                     }));
                 }));
@@ -350,32 +356,46 @@ function Schedules(){
         <table className="schedules">
             <thead>
             <tr>
+                <th></th>
                 <th>Team</th>
-                <th style={{cursor: 'pointer', fontWeight: positionSort === 'QB' ? 'bold' : 'normal'}}
-                    onClick={() => setPositionSort('QB')}>QB
-                </th>
-                <th style={{cursor: 'pointer', fontWeight: positionSort === 'RB' ? 'bold' : 'normal'}}
-                    onClick={() => setPositionSort('RB')}>RB
-                </th>
-                <th style={{cursor: 'pointer', fontWeight: positionSort === 'WR' ? 'bold' : 'normal'}}
-                    onClick={() => setPositionSort('WR')}>WR
-                </th>
-                <th style={{cursor: 'pointer', fontWeight: positionSort === 'TE' ? 'bold' : 'normal'}}
-                    onClick={() => setPositionSort('TE')}>TE
-                </th>
-                <th style={{cursor: 'pointer', fontWeight: positionSort === 'K' ? 'bold' : 'normal'}}
-                    onClick={() => setPositionSort('K')}>K
-                </th>
+                {Object.keys(Object.values(scores)[0].positionScores).sort((a, b) => {
+                    const sort = ['QB', 'RB', 'WR', 'TE', 'IDP', 'DEF', 'K'];
+                    const indexA = sort.indexOf(a);
+                    const indexB = sort.indexOf(b);
+                    if(indexA > indexB){
+                        return 1;
+                    }
+                    if(indexB > indexA){
+                        return -1;
+                    }
+                    return 0;
+                }).map(position => (
+                    <th key={position} style={{cursor: 'pointer', fontWeight: positionSort === position ? 'bold' : 'normal'}}
+                        onClick={() => setPositionSort(position)}>{position}
+                    </th>
+                ))}
             </tr>
             </thead>
             <tbody>
             {Object.entries(scores)
                    .sort((a, b) => b[1].positionScores[positionSort].points / b[1].positionScores[positionSort].numPlayers - a[1].positionScores[positionSort].points / a[1].positionScores[positionSort].numPlayers)
-                   .map(([rowRosterId, {positionScores}]) => {
+                   .map(([rowRosterId, {positionScores}], index) => {
                        const team = Object.values(teams)
                                           .find(team => parseInt(team.rosterId) === parseInt(rowRosterId));
-                       const order = ['QB', 'RB', 'WR', 'TE', 'K'];
+                       const sort = ['QB', 'RB', 'WR', 'TE', 'IDP', 'DEF', 'K'];
+                       const order = Object.keys(positionScores).sort((a, b) => {
+                           const indexA = sort.indexOf(a);
+                           const indexB = sort.indexOf(b);
+                           if(indexA > indexB){
+                               return 1;
+                           }
+                           if(indexB > indexA){
+                               return -1;
+                           }
+                           return 0;
+                       });
                        return (<tr key={rowRosterId}>
+                           <td>{index + 1}</td>
                            <td style={{textAlign: 'left'}}>{nameMap[team.displayName] || (team.teamName || team.displayName)}</td>
                            {order.map(position => (
                                <td key={position}>{(positionScores[position].points / positionScores[position].numPlayers).toFixed(1)}</td>))}
