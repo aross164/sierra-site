@@ -71,7 +71,8 @@ function Trades(){
                         let totalPoints = 0;
                         stats.forEach(([week, weekStats]) => {
                             const tradeWeek = getTradeWeek(trade);
-                            if(week < tradeWeek || !weekStats){
+                            if(week < tradeWeek || !(weekStats?.stats.off_snp || weekStats?.stats.def_snp)){
+                                // probably didn't play
                                 return;
                             }
                             numWeeks++;

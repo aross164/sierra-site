@@ -81,7 +81,7 @@ function App(){
         async function fetchNflWeek(){
             const response = await fetch('https://api.sleeper.app/v1/state/nfl');
             const weekInfo = await response.json();
-            return weekInfo.week;
+            return weekInfo.week || 18;
         }
 
         async function fetchPlayoffStart(){
