@@ -10,6 +10,7 @@ import EditRankings from './routes/EditRankings';
 import Rankings from './routes/Rankings';
 import Trades from './routes/Trades';
 import Schedules from './routes/Schedules';
+import TierList from "./components/TierList";
 
 function sierraLoader({request}){
     const url = new URL(request.url);
@@ -120,6 +121,11 @@ const router = createBrowserRouter([
             {
                 path: 'oasis',
                 element: <EditRankings week={15}/>,
+                loader: sierraLoader
+            },
+        {
+                path: 'list',
+                element: <TierList />,
                 loader: sierraLoader
             },
         ]
