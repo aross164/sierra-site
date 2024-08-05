@@ -52,17 +52,7 @@ export default function TierList({editable, entities, type}) {
         let newTiers = structuredClone(tiers);
         newTiers = hideGhostEntity(e, newTiers);
         const tier = newTiers.find(curTier => curTier.name === tierName);
-        const entityAlreadyExists = tier.entities.find(entity => entity.id === draggingEntity.id);
-        if (entityAlreadyExists) {
-            if (entityAlreadyExists.ghost && !entityAlreadyExists.hidden) {
-                return;
-            }
-            entityAlreadyExists.ghost = true;
-            entityAlreadyExists.hidden = false;
-        } else {
-            tier.entities.push({...draggingEntity, ghost: true});
-        }
-        console.log(entityAlreadyExists);
+        tier.entities.push({...draggingEntity, ghost: true});
         setTiers(newTiers);
     }
 
@@ -71,18 +61,17 @@ export default function TierList({editable, entities, type}) {
         const newTiers = getTiersCopy(passedTiers);
         let ghostEntity;
         newTiers.some(tier => {
-            return tier.entities.some(entity => {
-                if (entity.ghost && !entity.hidden) {
-                    ghostEntity = entity;
-                    return true;
+            tier.entities = tier.entities.filter(entity => {
+                if (entity.ghost) {
+                    ghostEntity = true;
                 }
-                return false;
+                return !entity.ghost;
             });
+            return ghostEntity;
         });
         if (!ghostEntity) {
             return newTiers;
         }
-        ghostEntity.hidden = true;
         if (passedTiers) {
             return newTiers;
         }
@@ -108,7 +97,6 @@ export default function TierList({editable, entities, type}) {
     }
 
     function stopDraggingEntity() {
-        debugger;
         const newTiers = structuredClone(tiers);
         newTiers.forEach(tier => {
             tier.entities = tier.entities.filter(entity => {
@@ -123,7 +111,7 @@ export default function TierList({editable, entities, type}) {
         e?.stopPropagation();
         const newTiers = structuredClone(tiers);
         const tier = newTiers.find(curTier => curTier.name === tierName);
-        const ghostIndex = tier.entities.findIndex(entity => entity.ghost && !entity.hidden);
+        const ghostIndex = tier.entities.findIndex(entity => entity.ghost);
         if (ghostIndex === index) {
             return;
         }
@@ -140,15 +128,13 @@ export default function TierList({editable, entities, type}) {
     }
 
     function convertGhostToReal(tierName) {
-        debugger;
         let newTiers = structuredClone(tiers);
         const tier = newTiers.find(tier => tier.name === tierName);
-        const ghostEntity = tier.entities.find(entity => entity.ghost && !entity.hidden);
+        const ghostEntity = tier.entities.find(entity => entity.ghost);
         if (!ghostEntity) {
             return;
         }
         ghostEntity.ghost = false;
-        ghostEntity.hidden = false;
         stopDraggingEntity();
         setTiers(newTiers);
     }
@@ -159,7 +145,7 @@ export default function TierList({editable, entities, type}) {
         setTiers(newTiers);
     }
 
-    function moveTier(curIndex, newIndex){
+    function moveTier(curIndex, newIndex) {
         const newTiers = structuredClone(tiers);
         const temp = newTiers[newIndex];
         newTiers[newIndex] = newTiers[curIndex];
@@ -167,16 +153,16 @@ export default function TierList({editable, entities, type}) {
         setTiers(newTiers);
     }
 
-    function addTier(index){
+    function addTier(index) {
         const newTiers = structuredClone(tiers);
         newTiers.splice(index, 0, {name: '', entities: []});
         setTiers(newTiers);
     }
 
-    function deleteTier(index){
+    function deleteTier(index) {
         const newTiers = structuredClone(tiers);
         const confirm = window.confirm(`Are you sure you want to delete tier: ${newTiers[index].name}?`);
-        if(!confirm){
+        if (!confirm) {
             return;
         }
 
@@ -189,14 +175,14 @@ export default function TierList({editable, entities, type}) {
     }
 
     return (
-        <div className="tier-list-container" onDragEnter={hideGhostEntity}>
+        <div className="tier-list-container">
             <div className="tier-list">
                 {tiers.map((tier, index) =>
                     <div
                         className="row" key={tier.entities.join() + colors[index]}
                         style={{backgroundColor: colors[index]}}
                     >
-                        <div className="tier-name" onDragEnter={hideGhostEntity} style={{userSelect: 'none'}}
+                        <div className="tier-name" style={{userSelect: 'none'}}
                         >
                             {
                                 editable ?
@@ -223,7 +209,7 @@ export default function TierList({editable, entities, type}) {
                                             startDraggingEntity={e => startDraggingRankedEntity(e, tier.name, entity.id)}
                                             stopDraggingEntity={stopDraggingEntity} entityId={entity.id}
                                             moveEntityToIndex={(e, index) => moveEntityToIndex(e, tier.name, index)}
-                                            sortable hidden={entity.hidden}
+                                            sortable
                                         /> :
                                         <Player
                                             firstName={entity.first_name} lastName={entity.last_name} key={entity.id}
@@ -231,7 +217,7 @@ export default function TierList({editable, entities, type}) {
                                             startDraggingEntity={e => startDraggingRankedEntity(e, tier.name, entity.id)}
                                             stopDraggingEntity={stopDraggingEntity} entityId={entity.id}
                                             moveEntityToIndex={(e, index) => moveEntityToIndex(e, tier.name, index)}
-                                            sortable hidden={entity.hidden}
+                                            sortable
                                         />
                                 )
                             )}
@@ -301,11 +287,10 @@ function Entity({
                     index,
                     moveEntityToIndex,
                     sortable,
-                    hidden,
                     type
                 }) {
     return (
-        <div style={{position: 'relative', display: hidden ? 'none' : 'block'}} key={entityId}
+        <div style={{position: 'relative'}} key={entityId}
              onDragStart={startDraggingEntity} onDragEnd={stopDraggingEntity} data-id={entityId}
              draggable={draggable}
         >
