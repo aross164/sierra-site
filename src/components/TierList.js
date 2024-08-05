@@ -1,247 +1,341 @@
-import React, {useEffect, useState} from 'react';
-import {fetchPlayerInfo} from "../utils/utils";
+import React, {useState} from 'react';
 import 'drag-drop-touch';
 
-const options = [
-    "6804",
-    "9509",
-    "4199",
-    "2449",
-    "4037",
-    "8110",
-    "6803",
-    "9231",
-    "3451"
+const colors = [
+    '#ff807f',
+    '#ffbe81',
+    '#ffdf82',
+    '#ffff7f',
+    '#bfff80',
+    '#7fff7f',
+    '#80FFFF',
+    '#7fbfff',
+    '#7f7fff',
+    '#ff7fff',
+    '#bf7fbf',
+    '#3b3b3b',
 ];
 
-export default function TierList() {
-    const [players, setPlayers] = useState([]);
+
+// TODO: figure out why we're hiding ghost entities instead of removing
+export default function TierList({editable, entities, type}) {
     const [tiers, setTiers] = useState([
-        {name: 'S', color: '#ff807f', players: []},
-        {name: 'A', color: '#ffbe81', players: []},
-        {name: 'B', color: '#ffdf82', players: []},
-        {name: 'C', color: '#ffff7f', players: []},
-        {name: 'D', color: '#bfff80', players: []},
-        {name: 'F', color: '#7fff7f', players: []}
+        {name: 'S', entities: []},
+        {name: 'A', entities: []},
+        {name: 'B', entities: []},
+        {name: 'C', entities: []},
+        {name: 'D', entities: []},
+        {name: 'F', entities: []}
     ]);
-    const [draggingPlayer, setDraggingPlayer] = useState({});
-    const unranked = tiers.reduce((curPlayers, tier) => {
-        const newCurPlayers = [...curPlayers];
-        tier.players.forEach(tierPlayer => {
-            if (tierPlayer.ghost) {
+    const [draggingEntity, setDraggingEntity] = useState({});
+    const unranked = tiers.reduce((curEntities, tier) => {
+        const newCurEntities = [...curEntities];
+        tier.entities.forEach(tierEntity => {
+            if (tierEntity.ghost) {
                 return;
             }
-            newCurPlayers.splice(newCurPlayers.findIndex(player => player.player_id === tierPlayer.player_id), 1)
-        })
-        return newCurPlayers;
-    }, players);
+            newCurEntities.splice(newCurEntities.findIndex(entity => entity.id === tierEntity.id), 1);
+        });
+        return newCurEntities;
+    }, entities);
 
-    useEffect(() => {
-        Promise.all(options.map(option => fetchPlayerInfo(option)))
-            .then(newPlayers => setPlayers(newPlayers))
-    }, []);
+    function getTiersCopy(passedTiers) {
+        let newTiers = passedTiers;
+        if (!newTiers) {
+            newTiers = structuredClone(tiers);
+        }
+        return newTiers;
+    }
 
-    function addGhostPlayer(e, tierName) {
+    function addGhostEntity(e, tierName) {
         e?.stopPropagation();
         let newTiers = structuredClone(tiers);
-        newTiers = hideGhostPlayer(e, newTiers);
+        newTiers = hideGhostEntity(e, newTiers);
         const tier = newTiers.find(curTier => curTier.name === tierName);
-        const playerAlreadyExists = tier.players.find(player => player.player_id === draggingPlayer.player_id);
-        if (playerAlreadyExists) {
-            if (playerAlreadyExists.ghost && !playerAlreadyExists.hidden) {
+        const entityAlreadyExists = tier.entities.find(entity => entity.id === draggingEntity.id);
+        if (entityAlreadyExists) {
+            if (entityAlreadyExists.ghost && !entityAlreadyExists.hidden) {
                 return;
             }
-            playerAlreadyExists.ghost = true;
-            playerAlreadyExists.hidden = false;
+            entityAlreadyExists.ghost = true;
+            entityAlreadyExists.hidden = false;
         } else {
-            tier.players.push({...draggingPlayer, ghost: true});
+            tier.entities.push({...draggingEntity, ghost: true});
         }
+        console.log(entityAlreadyExists);
         setTiers(newTiers);
     }
 
-    function removeGhostPlayers(passedTiers) {
-        let newTiers = passedTiers;
-        if (!newTiers) {
-            newTiers = structuredClone(tiers);
-        }
-        newTiers.forEach(tier => {
-            tier.players = tier.players.filter(player => {
-                return !player.ghost
-            });
-        })
-        if (passedTiers) {
-            return newTiers;
-        }
-        setTiers(newTiers);
-    }
-
-    function hideGhostPlayer(e, passedTiers) {
+    function hideGhostEntity(e, passedTiers) {
         e.stopPropagation();
-        let newTiers = passedTiers;
-        if (!newTiers) {
-            newTiers = structuredClone(tiers);
-        }
-        let ghostPlayer;
-        let numGhostPlayers = 0;
-        newTiers.forEach(tier => {
-            return tier.players.forEach(player => {
-                if (player.ghost && !player.hidden) {
-                    ghostPlayer = player;
-                    numGhostPlayers++;
+        const newTiers = getTiersCopy(passedTiers);
+        let ghostEntity;
+        newTiers.some(tier => {
+            return tier.entities.some(entity => {
+                if (entity.ghost && !entity.hidden) {
+                    ghostEntity = entity;
                     return true;
                 }
                 return false;
-            })
+            });
         });
-        if (!ghostPlayer) {
+        if (!ghostEntity) {
             return newTiers;
         }
-        ghostPlayer.hidden = true;
+        ghostEntity.hidden = true;
         if (passedTiers) {
             return newTiers;
         }
         setTiers(newTiers);
     }
 
-    function startDraggingPlayer(e) {
-        const playerId = e?.target.dataset.playerId;
-        e.dataTransfer.setData('text/plain', 'Im dragging')
-        if (!playerId) {
+    function startDraggingEntity(e) {
+        const id = e?.target.dataset.id;
+        e.dataTransfer.setData('text/plain', 'Im dragging');
+        if (!id) {
             return;
         }
-        setDraggingPlayer(players.find(player => player.player_id === playerId))
+        setDraggingEntity(entities.find(entity => entity.id === id));
     }
 
-    function startDraggingRankedPlayer(e, tierName, playerId) {
-        // addGhostPlayer(e, tierName);
+    function startDraggingRankedEntity(e, tierName, id) {
         const newTiers = structuredClone(tiers);
         const tier = newTiers.find(curTier => curTier.name === tierName);
-        const player = tier.players.find(player => player.player_id === playerId);
-        player.ghost = true;
+        const entity = tier.entities.find(entity => entity.id === id);
+        entity.ghost = true;
         setTiers(newTiers);
-        startDraggingPlayer(e);
+        startDraggingEntity(e);
     }
 
-    function stopDraggingPlayer() {
-        setDraggingPlayer({});
+    function stopDraggingEntity() {
+        debugger;
+        const newTiers = structuredClone(tiers);
+        newTiers.forEach(tier => {
+            tier.entities = tier.entities.filter(entity => {
+                return !entity.ghost;
+            });
+        });
+        setTiers(newTiers);
+        setDraggingEntity({});
     }
 
-    useEffect(() => {
-        if (!Object.keys(draggingPlayer).length) {
-            removeGhostPlayers();
-        }
-    }, [draggingPlayer])
-
-    function movePlayerToIndex(e, tierName, index) {
+    function moveEntityToIndex(e, tierName, index) {
         e?.stopPropagation();
         const newTiers = structuredClone(tiers);
         const tier = newTiers.find(curTier => curTier.name === tierName);
-        const ghostIndex = tier.players.findIndex(player => player.ghost && !player.hidden);
+        const ghostIndex = tier.entities.findIndex(entity => entity.ghost && !entity.hidden);
         if (ghostIndex === index) {
             return;
         }
         if (ghostIndex === -1) {
-            if (!Object.keys(draggingPlayer).length) {
+            if (!Object.keys(draggingEntity).length) {
                 return;
             }
-            addGhostPlayer(e, tierName);
+            addGhostEntity(e, tierName);
             return;
         }
-        const [ghostPlayer] = tier.players.splice(ghostIndex, 1);
-        tier.players.splice(index, 0, ghostPlayer);
+        const [ghostEntity] = tier.entities.splice(ghostIndex, 1);
+        tier.entities.splice(index, 0, ghostEntity);
         setTiers(newTiers);
     }
 
     function convertGhostToReal(tierName) {
+        debugger;
         let newTiers = structuredClone(tiers);
         const tier = newTiers.find(tier => tier.name === tierName);
-        const ghostPlayer = tier.players.find(player => player.ghost);
-        if (!ghostPlayer) {
+        const ghostEntity = tier.entities.find(entity => entity.ghost && !entity.hidden);
+        if (!ghostEntity) {
             return;
         }
-        ghostPlayer.ghost = false;
-        ghostPlayer.hidden = false;
-        // newTiers = removeGhostPlayers(newTiers);
-        stopDraggingPlayer();
+        ghostEntity.ghost = false;
+        ghostEntity.hidden = false;
+        stopDraggingEntity();
         setTiers(newTiers);
     }
 
-    if (!players.length) {
-        return <div>No players</div>
+    function updateTierName(e, index) {
+        const newTiers = structuredClone(tiers);
+        newTiers[index].name = e.target.value;
+        setTiers(newTiers);
+    }
+
+    function moveTier(curIndex, newIndex){
+        const newTiers = structuredClone(tiers);
+        const temp = newTiers[newIndex];
+        newTiers[newIndex] = newTiers[curIndex];
+        newTiers[curIndex] = temp;
+        setTiers(newTiers);
+    }
+
+    function addTier(index){
+        const newTiers = structuredClone(tiers);
+        newTiers.splice(index, 0, {name: '', entities: []});
+        setTiers(newTiers);
+    }
+
+    function deleteTier(index){
+        const newTiers = structuredClone(tiers);
+        const confirm = window.confirm(`Are you sure you want to delete tier: ${newTiers[index].name}?`);
+        if(!confirm){
+            return;
+        }
+
+        newTiers.splice(index, 1);
+        setTiers(newTiers);
+    }
+
+    if (!entities.length) {
+        return <div>No data</div>;
     }
 
     return (
-        <div className="tier-list-container" onDragEnter={hideGhostPlayer}>
+        <div className="tier-list-container" onDragEnter={hideGhostEntity}>
             <div className="tier-list">
-                {tiers.map(tier =>
+                {tiers.map((tier, index) =>
                     <div
-                        className="row" key={tier.name}
-                        style={{backgroundColor: tier.color}}>
-                        <div className="tier-name" onDragEnter={hideGhostPlayer}>{tier.name}</div>
-                        <div
-                            className="rankings" onDragEnter={e => addGhostPlayer(e, tier.name)}
-                            onDragOver={e => e.preventDefault()}
-                            onDrop={() => convertGhostToReal(tier.name)}>
-                            {tier.players.map((player, index) =>
-                                <Player
-                                    firstName={player.first_name} lastName={player.last_name} key={player.player_id}
-                                    draggable
-                                    startDraggingPlayer={e => startDraggingRankedPlayer(e, tier.name, player.player_id)}
-                                    stopDraggingPlayer={stopDraggingPlayer} playerId={player.player_id}
-                                    ghost={player.ghost} tierName={tier.name} index={index}
-                                    movePlayerToIndex={movePlayerToIndex} sortable hidden={player.hidden}/>
-                            )}
-                            <div className="last-index"
-                                 onDragEnter={e => movePlayerToIndex(e, tier.name, tier.players.length)}>
-                            </div>
+                        className="row" key={tier.entities.join() + colors[index]}
+                        style={{backgroundColor: colors[index]}}
+                    >
+                        <div className="tier-name" onDragEnter={hideGhostEntity} style={{userSelect: 'none'}}
+                        >
+                            {
+                                editable ?
+                                    <input value={tier.name} className="tier-name-input"
+                                           onInput={e => updateTierName(e, index)}
+                                    />
+                                    : tier.name
+                            }
+                            {
+                                tiers.length !== 12 ?
+                                    <button onClick={() => addTier(index + 1)}>+</button>
+                                    : null
+                            }
                         </div>
+                        <div
+                            className="rankings" onDragEnter={e => addGhostEntity(e, tier.name)}
+                            onDragOver={e => e.preventDefault()}
+                            onDrop={() => convertGhostToReal(tier.name)}
+                        >
+                            {tier.entities.map((entity, index) => (
+                                    type === 'team' ? <Team
+                                            label={entity.teamName} key={entity.id} draggable={editable} ghost={entity.ghost}
+                                            tierName={tier.name} index={index} src={entity.avatar}
+                                            startDraggingEntity={e => startDraggingRankedEntity(e, tier.name, entity.id)}
+                                            stopDraggingEntity={stopDraggingEntity} entityId={entity.id}
+                                            moveEntityToIndex={(e, index) => moveEntityToIndex(e, tier.name, index)}
+                                            sortable hidden={entity.hidden}
+                                        /> :
+                                        <Player
+                                            firstName={entity.first_name} lastName={entity.last_name} key={entity.id}
+                                            draggable={editable} ghost={entity.ghost} tierName={tier.name} index={index}
+                                            startDraggingEntity={e => startDraggingRankedEntity(e, tier.name, entity.id)}
+                                            stopDraggingEntity={stopDraggingEntity} entityId={entity.id}
+                                            moveEntityToIndex={(e, index) => moveEntityToIndex(e, tier.name, index)}
+                                            sortable hidden={entity.hidden}
+                                        />
+                                )
+                            )}
+                            {
+                                editable ?
+                                    <div className="last-index"
+                                         onDragEnter={e => moveEntityToIndex(e, tier.name, tier.entities.length)}
+                                    >
+                                    </div>
+                                    : null
+                            }
+                        </div>
+                        {
+                            editable ?
+                                <div className="controls">
+                                    <button onClick={() => deleteTier(index)}>Delete</button>
+                                    <div className="move">
+                                        {
+                                            index !== 0 ?
+                                                <button onClick={() => moveTier(index, index - 1)}>Up</button>
+                                                : null
+                                        }
+                                        {
+                                            index !== tiers.length - 1 ?
+                                                <button onClick={() => moveTier(index, index + 1)}>Down</button>
+                                                : null
+                                        }
+                                    </div>
+                                </div>
+                                : null
+                        }
                     </div>
                 )}
             </div>
-            <div className="options-list">
-                {unranked.map(player =>
-                    <Player
-                        key={player.player_id} playerId={player.player_id} firstName={player.first_name}
-                        lastName={player.last_name} startDraggingPlayer={startDraggingPlayer}
-                        stopDraggingPlayer={stopDraggingPlayer} draggable/>
-                )}
-            </div>
+            {
+                editable ?
+                    <div className="options-list">
+                        {unranked.map(entity => (
+                            type === 'team' ?
+                                <Team
+                                    key={entity.id} entityId={entity.id} label={entity.teamName}
+                                    startDraggingEntity={startDraggingEntity} src={entity.avatar}
+                                    stopDraggingEntity={stopDraggingEntity} draggable
+                                /> :
+                                <Player
+                                    key={entity.id} entityId={entity.id} firstName={entity.first_name}
+                                    lastName={entity.last_name} startDraggingEntity={startDraggingEntity}
+                                    stopDraggingEntity={stopDraggingEntity} draggable
+                                />
+                        ))}
+                    </div>
+                    : null
+            }
         </div>
-    )
+    );
+}
+
+function Entity({
+                    label,
+                    alt,
+                    src,
+                    entityId,
+                    startDraggingEntity,
+                    stopDraggingEntity,
+                    draggable,
+                    ghost,
+                    index,
+                    moveEntityToIndex,
+                    sortable,
+                    hidden,
+                    type
+                }) {
+    return (
+        <div style={{position: 'relative', display: hidden ? 'none' : 'block'}} key={entityId}
+             onDragStart={startDraggingEntity} onDragEnd={stopDraggingEntity} data-id={entityId}
+             draggable={draggable}
+        >
+            {sortable ?
+                <div className="reorder left" onDragEnter={e => moveEntityToIndex(e, index)}></div>
+                : null}
+            <div className={`option ${ghost ? 'ghost' : ''}`}>
+                <img src={src} alt={alt} draggable="false"/>
+                <div className={`entity-name ${type === 'team' ? 'team-name' : 'player-name'}`}>
+                    <span className="entity-name-text">{label}</span>
+                </div>
+            </div>
+            {sortable ?
+                <div className="reorder right" onDragEnter={e => moveEntityToIndex(e, index + 1)}></div>
+                : null}
+        </div>
+    );
 }
 
 function Player({
                     firstName,
                     lastName,
-                    playerId,
-                    startDraggingPlayer,
-                    stopDraggingPlayer,
-                    draggable,
-                    ghost,
-                    tierName,
-                    index,
-                    movePlayerToIndex,
-                    sortable,
-                    hidden
+                    ...props
                 }) {
-    return (
-        <div style={{position: 'relative', display: hidden ? 'none' : 'block'}} key={playerId}
-             onDragStart={startDraggingPlayer}
-             onDragEnd={stopDraggingPlayer}
-             data-player-id={playerId}
-             draggable={draggable}>
-            {sortable ? <div className="reorder left"
-                             onDragEnter={e => movePlayerToIndex(e, tierName, index)}></div> : null}
+    const label = `${firstName?.[0]}. ${lastName}`;
+    const alt = `${firstName} ${lastName}`;
+    const src = `https://sleepercdn.com/content/nfl/players/${props.entityId}.jpg`;
+    return <Entity {...props} label={label} alt={alt} src={src}/>;
+}
 
-            <div className={`option ${ghost ? 'ghost' : ''}`}>
-                <img src={`https://sleepercdn.com/content/nfl/players/${playerId}.jpg`} alt={`${firstName} ${lastName}`}
-                     draggable="false"/>
-                <div className="player-name">
-                    <span className="player-name-text">{firstName?.[0]}. {lastName}</span>
-                </div>
-            </div>
-            {sortable ? <div className="reorder right"
-                             onDragEnter={e => movePlayerToIndex(e, tierName, index + 1)}></div> : null}
-        </div>
-    )
+function Team(props) {
+    return <Entity {...props} alt={props.label} type="team"/>;
 }

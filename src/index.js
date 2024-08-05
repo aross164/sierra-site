@@ -11,6 +11,7 @@ import Rankings from './routes/Rankings';
 import Trades from './routes/Trades';
 import Schedules from './routes/Schedules';
 import TierList from "./components/TierList";
+import TierListPage from './routes/TierListPage';
 
 function sierraLoader({request}){
     const url = new URL(request.url);
@@ -125,7 +126,7 @@ const router = createBrowserRouter([
             },
         {
                 path: 'list',
-                element: <TierList />,
+                element: <TierListPage />,
                 loader: sierraLoader
             },
         ]
