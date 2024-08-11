@@ -135,6 +135,7 @@ export default function TierList({
         if (draggingEntity && !Object.keys(draggingEntity).length) {
             removeGhostEntities();
         }
+        // eslint-disable-next-line
     }, [draggingEntity]);
 
     function moveEntityToIndex(e, tierIndex, entityIndex) {

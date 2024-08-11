@@ -10,7 +10,6 @@ import EditRankings from './routes/EditRankings';
 import Rankings from './routes/Rankings';
 import Trades from './routes/Trades';
 import Schedules from './routes/Schedules';
-import TierList from "./components/TierList";
 import TierListPage from './routes/TierListPage';
 
 function sierraLoader({request}){

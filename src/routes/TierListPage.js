@@ -1,3 +1,4 @@
+// esl
 import React, {useContext, useEffect, useState} from 'react';
 import TierList from '../components/TierList';
 import AppContext from '../contexts/AppContext';
@@ -16,6 +17,7 @@ const options = [
 ];
 
 export default function TierListPage(){
+    // eslint-disable-next-line
     const [players, setPlayers] = useState([]);
 
     useEffect(() => {
