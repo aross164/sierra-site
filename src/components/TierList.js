@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import 'drag-drop-touch';
 
 const colors = [
@@ -40,6 +40,7 @@ export default function TierList({
         });
         return newCurEntities;
     }, entities);
+    const timeoutRef = useRef(null);
 
     function getTiersCopy(passedTiers) {
         let newTiers = passedTiers;
@@ -175,7 +176,13 @@ export default function TierList({
         const newTiers = structuredClone(tiers);
         newTiers[index].name = e.target.value;
         setTiers(newTiers);
-        saveState(newTiers);
+
+        if(timeoutRef.current){
+            clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
+            saveState(newTiers);
+        }, 1000)
     }
 
     function moveTier(curIndex, newIndex) {
