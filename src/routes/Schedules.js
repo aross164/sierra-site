@@ -243,7 +243,7 @@ function Schedules(){
         </>);
     }
 
-    if(!Object.keys(scores).length || !Object.keys(whatIfScores).length || !leagues){
+    if(!Object.keys(scores).length || !Object.keys(Object.values(scores)[0].positionScores).length || !Object.keys(whatIfScores).length || !leagues){
         return <div>Loading...</div>;
     }
 
