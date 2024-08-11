@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import 'drag-drop-touch';
 
 const colors = [
@@ -17,7 +17,10 @@ const colors = [
 ];
 
 
-export default function TierList({editable, entities, type, saveState = () => {}, initTiers}) {
+export default function TierList({
+                                     editable, entities, type, saveState = () => {
+    }, initTiers
+                                 }) {
     const [tiers, setTiers] = useState(initTiers || [
         {name: 'S', entities: []},
         {name: 'A', entities: []},
@@ -124,12 +127,7 @@ export default function TierList({editable, entities, type, saveState = () => {}
         startDraggingEntity(e);
     }
 
-    function stopDraggingEntity(e, skipCheck) {
-        if(!skipCheck) {
-            if(tiers.some(tier => tier.entities.some(entity => entity.ghost))){
-                return;
-            }
-        }
+    function stopDraggingEntity() {
         setDraggingEntity({});
     }
 
@@ -168,7 +166,7 @@ export default function TierList({editable, entities, type, saveState = () => {}
         }
         ghostEntity.ghost = false;
         ghostEntity.hidden = false;
-        stopDraggingEntity({}, true);
+        stopDraggingEntity();
         setTiers(newTiers);
     }
 
@@ -214,11 +212,9 @@ export default function TierList({editable, entities, type, saveState = () => {}
         <div className="tier-list-container" onDragEnter={hideGhostEntity}>
             <div className="tier-list">
                 {tiers.map((tier, index) =>
-                    <div
-                        className="row" key={tier.entities.join() + colors[index]}
-                        style={{backgroundColor: colors[index]}}
-                    >
+                    <Fragment key={tier.entities.join() + colors[index]}>
                         <div className="tier-name" onDragEnter={hideGhostEntity}
+                             style={{backgroundColor: colors[index]}}
                         >
                             {
                                 editable ?
@@ -258,7 +254,7 @@ export default function TierList({editable, entities, type, saveState = () => {}
                         <div
                             className="rankings" onDragEnter={e => addGhostEntity(e, index)}
                             onDragOver={e => e.preventDefault()}
-                            onDrop={() => convertGhostToReal(index)}
+                            onDrop={() => convertGhostToReal(index)} style={{backgroundColor: colors[index]}}
                         >
                             {tier.entities.map((entity, entityIndex) => (
                                     type === 'team' ? <Team
@@ -271,7 +267,8 @@ export default function TierList({editable, entities, type, saveState = () => {}
                                         /> :
                                         <Player
                                             firstName={entity.first_name} lastName={entity.last_name} key={entity.id}
-                                            draggable={editable} ghost={entity.ghost} tierName={tier.name} index={entityIndex}
+                                            draggable={editable} ghost={entity.ghost} tierName={tier.name}
+                                            index={entityIndex}
                                             startDraggingEntity={e => startDraggingRankedEntity(e, index, entity.id)}
                                             stopDraggingEntity={stopDraggingEntity} entityId={entity.id}
                                             moveEntityToIndex={(e, toIndex) => moveEntityToIndex(e, index, toIndex)}
@@ -288,7 +285,7 @@ export default function TierList({editable, entities, type, saveState = () => {}
                                     : null
                             }
                         </div>
-                    </div>
+                    </Fragment>
                 )}
             </div>
             {

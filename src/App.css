@@ -183,6 +183,7 @@ figure img {
 .edit-rankings {
     .tier-list-container {
         width: 100%;
+        max-width: 95em;
         margin-bottom: 1em;
     }
 }
@@ -284,21 +285,15 @@ figure img {
 }
 
 .tier-list-container {
-    .row {
-        display: flex;
-        min-height: 4.5em;
-        max-width: 95vw;
-    }
-
     .tier-name {
-        width: 4.5em;
+        min-height: 4.5em;
+        min-width: 4.5em;
         border-right: 1px solid black;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        padding-top: 0.5em;
-        padding-bottom: 0.5em;
+        padding: 0.5em;
 
         button {
             margin-top: 0.5em;
@@ -319,7 +314,7 @@ figure img {
         flex-wrap: wrap;
         flex-grow: 1;
         padding: 0.25em 0.5em;
-        gap: 0.5em 0;
+        gap: 0.5em;
     }
 
     .option {
@@ -404,6 +399,11 @@ figure img {
     .tier-list-container {
         margin-bottom: 1em;
     }
+}
+
+.tier-list{
+    display: grid;
+    grid-template-columns: min-content 1fr;
 }
 
 @media only screen and (max-width: 375px) {

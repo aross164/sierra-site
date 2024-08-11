@@ -18,7 +18,6 @@ function Rankings() {
     const [rankings, setRankings] = useState({});
     const [weeks, setWeeks] = useState([]);
 
-    console.log(Object.values(rankings));
     const hasRankings = Object.values(rankings).some(ranking => ranking.blurb !== '<p><br></p>');
 
     useEffect(() => {
