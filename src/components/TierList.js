@@ -17,9 +17,8 @@ const colors = [
 ];
 
 
-// TODO: figure out why we're hiding ghost entities instead of removing
-export default function TierList({editable, entities, type}) {
-    const [tiers, setTiers] = useState([
+export default function TierList({editable, entities, type, saveState, initTiers}) {
+    const [tiers, setTiers] = useState(initTiers || [
         {name: 'S', entities: []},
         {name: 'A', entities: []},
         {name: 'B', entities: []},
@@ -27,7 +26,7 @@ export default function TierList({editable, entities, type}) {
         {name: 'D', entities: []},
         {name: 'F', entities: []}
     ]);
-    const [draggingEntity, setDraggingEntity] = useState({});
+    const [draggingEntity, setDraggingEntity] = useState(null);
     const unranked = tiers.reduce((curEntities, tier) => {
         const newCurEntities = [...curEntities];
         tier.entities.forEach(tierEntity => {
@@ -73,6 +72,9 @@ export default function TierList({editable, entities, type}) {
             });
         });
         setTiers(newTiers);
+        if (!Object.keys(draggingEntity).length) {
+            saveState(newTiers);
+        }
     }
 
     /**
@@ -122,18 +124,22 @@ export default function TierList({editable, entities, type}) {
         startDraggingEntity(e);
     }
 
-    function stopDraggingEntity() {
+    function stopDraggingEntity(e, skipCheck) {
+        if(!skipCheck) {
+            if(tiers.some(tier => tier.entities.some(entity => entity.ghost))){
+                return;
+            }
+        }
         setDraggingEntity({});
     }
 
     useEffect(() => {
-        if (!Object.keys(draggingEntity).length) {
+        if (draggingEntity && !Object.keys(draggingEntity).length) {
             removeGhostEntities();
         }
     }, [draggingEntity]);
 
     function moveEntityToIndex(e, tierName, index) {
-        console.log(e);
         e?.stopPropagation();
         const newTiers = structuredClone(tiers);
         const tier = newTiers.find(curTier => curTier.name === tierName);
@@ -162,7 +168,7 @@ export default function TierList({editable, entities, type}) {
         }
         ghostEntity.ghost = false;
         ghostEntity.hidden = false;
-        stopDraggingEntity();
+        stopDraggingEntity({}, true);
         setTiers(newTiers);
     }
 
@@ -170,6 +176,7 @@ export default function TierList({editable, entities, type}) {
         const newTiers = structuredClone(tiers);
         newTiers[index].name = e.target.value;
         setTiers(newTiers);
+        saveState(newTiers);
     }
 
     function moveTier(curIndex, newIndex) {
@@ -184,6 +191,7 @@ export default function TierList({editable, entities, type}) {
         const newTiers = structuredClone(tiers);
         newTiers.splice(index, 0, {name: '', entities: []});
         setTiers(newTiers);
+        saveState(newTiers);
     }
 
     function deleteTier(index) {
@@ -195,6 +203,7 @@ export default function TierList({editable, entities, type}) {
 
         newTiers.splice(index, 1);
         setTiers(newTiers);
+        saveState(newTiers);
     }
 
     if (!entities.length) {
@@ -209,21 +218,27 @@ export default function TierList({editable, entities, type}) {
                         className="row" key={tier.entities.join() + colors[index]}
                         style={{backgroundColor: colors[index]}}
                     >
-                        <div className="tier-name" style={{userSelect: 'none'}} onDragEnter={hideGhostEntity}
+                        <div className="tier-name" onDragEnter={hideGhostEntity}
                         >
                             {
                                 editable ?
-                                    <input value={tier.name} className="tier-name-input"
-                                           onInput={e => updateTierName(e, index)}
-                                    />
+                                    <textarea className="tier-name-input" value={tier.name}
+                                              onInput={e => updateTierName(e, index)}
+                                    ></textarea>
                                     : tier.name
                             }
                             {
                                 editable ?
                                     <div className="controls">
-                                        <button onClick={() => deleteTier(index)}>
-                                            <img alt="delete" className="trash-can" src="/images/trash-can.png"/>
-                                        </button>
+                                        {
+                                            tiers.length > 1 ?
+                                                <button onClick={() => deleteTier(index)}>
+                                                    <img alt="delete" className="trash-can"
+                                                         src="/images/trash-can.png"
+                                                    />
+                                                </button>
+                                                : null
+                                        }
                                         <div className="move">
                                             {
                                                 index !== 0 ?
@@ -278,7 +293,7 @@ export default function TierList({editable, entities, type}) {
             </div>
             {
                 editable && tiers.length !== 12 ?
-                    <button onClick={() => addTier(tiers.length)}>+</button>
+                    <button style={{margin: '0.5em 0'}} onClick={() => addTier(tiers.length)}>Add Tier</button>
                     : null
             }
             {

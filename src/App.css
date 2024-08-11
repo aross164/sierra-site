@@ -1,95 +1,95 @@
-.app{
+.app {
     padding: 1em;
 }
 
-h1{
+h1 {
     margin-top: 0;
     text-align: center;
 }
 
-h2{
+h2 {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
 
-.team-container{
+.team-container {
     max-width: min(80vw, 600px);
     padding-bottom: 3em;
 }
 
-.editor-container{
+.editor-container {
     border: 1px solid black;
 }
 
-.flex{
+.flex {
     display: flex;
 }
 
-.align-center{
+.align-center {
     align-items: center;
 }
 
-.justify-center{
+.justify-center {
     justify-content: center;
 }
 
-.week-option{
+.week-option {
     text-decoration: underline;
     color: #0066cc;
     cursor: pointer;
 }
 
-.week-option.current{
+.week-option.current {
     text-decoration: none;
     cursor: default;
     color: black;
 }
 
-.week-option:not(.current):hover{
+.week-option:not(.current):hover {
     color: #ee0000;
 }
 
-.save-button{
+.save-button {
     position: fixed;
     bottom: 6em;
     right: 1em;
 }
 
-.blurb-container{
+.blurb-container {
     box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.3);
     padding: 0.5em;
     margin-bottom: 1em;
     border-radius: 0.375em;
 }
 
-p{
+p {
     margin: 0;
 }
 
-.public-DraftStyleDefault-block{
+.public-DraftStyleDefault-block {
     margin: 0 !important;
 }
 
-.avatar{
+.avatar {
     border-radius: 50%;
     max-width: 2em;
     max-height: 2em;
     margin-right: 0.25em;
 }
 
-.break{
+.break {
     margin-right: 1em;
 }
 
-.team-name{
+.team-name {
     font-size: 0.7em;
 }
 
-.trades-page h2{
+.trades-page h2 {
     text-align: center;
 }
 
-.trade-container{
+.trade-container {
     padding: 0.5em;
     box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.3);
     margin-bottom: 1.25em;
@@ -98,22 +98,22 @@ p{
     width: 350px;
 }
 
-.trade-container h3{
+.trade-container h3 {
     margin: 0;
     text-align: center;
     font-size: 1.5em;
 }
 
-.trade-container :is(td, th){
+.trade-container :is(td, th) {
     padding: 0.2em 0.5em;
     text-align: center;
 }
 
-.trade-container th{
+.trade-container th {
     padding-bottom: 0;
 }
 
-footer{
+footer {
     height: 3rem;
     background-color: black;
     width: 100vw;
@@ -127,11 +127,11 @@ footer{
     z-index: 1;
 }
 
-footer a{
+footer a {
     color: white;
 }
 
-.footerPage{
+.footerPage {
     cursor: pointer;
     flex: 1;
     height: 100%;
@@ -140,7 +140,7 @@ footer a{
     justify-content: center;
 }
 
-.activePage{
+.activePage {
     border-radius: 50%;
     margin-left: 0.5em;
     background-color: white;
@@ -148,137 +148,149 @@ footer a{
     width: 0.6em;
 }
 
-.trade-player-info{
+.trade-player-info {
     font-size: 0.8em;
     text-align: center;
 }
 
-.trade-player-info-separator{
+.trade-player-info-separator {
     margin: 0 0.375em;
     font-weight: bold;
 }
 
-.trade-player-info-team{
+.trade-player-info-team {
     --spacing: 0.3125em;
     border-left: 2px solid black;
     padding-left: var(--spacing);
     margin-left: var(--spacing);
 }
 
-.editor-area{
+.editor-area {
     min-height: 10em;
     padding: 0.5em;
 }
 
-figure{
+figure {
     margin: 0 0.5em;
     text-align: center;
 }
 
-figure img{
+figure img {
     object-fit: contain;
     max-width: 100%;
 }
 
-@media only screen and (max-width: 450px){
-    .break{
+.edit-rankings {
+    .tier-list-container {
+        width: 100%;
+        margin-bottom: 1em;
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    .break {
         margin: 0;
         flex-basis: 100%;
         height: 0;
     }
 
-    .edit-rankings h2{
+    .edit-rankings h2 {
         font-size: 1.1em;
     }
 
-    .blurb-container h2, .trade-container h3{
+    .blurb-container h2, .trade-container h3 {
         font-size: 1.25em;
     }
 
-    .button-container{
+    .button-container {
         justify-content: flex-end;
         width: 100%;
     }
 
-    .trade-player-info{
+    .trade-player-info {
         font-size: 0.75em;
     }
 
-    .editor-area{
+    .editor-area {
         min-height: auto;
     }
 }
 
-.schedules{
+.tier-list-container, .tier-list-container * {
+    user-select: none;
+}
+
+.schedules {
     border-collapse: collapse;
 }
 
-.schedules :is(td, th){
+.schedules :is(td, th) {
     text-align: center;
 }
 
-.schedules :is(td, th){
+.schedules :is(td, th) {
     padding: 0.25em;
     border: 1px solid black
 }
 
-.schedules th{
+.schedules th {
     padding-bottom: 0;
 }
 
-.schedules .same{
+.schedules .same {
     background-color: lightgoldenrodyellow;
 }
 
-.schedules .more{
+.schedules .more {
     background-color: lightgreen;
 }
 
-.schedules .less{
+.schedules .less {
     background-color: lightpink;
 }
 
-.schedules :is(td:first-child, th:first-child){
+.schedules :is(td:first-child, th:first-child) {
     left: 0;
     position: sticky;
     background-color: white;
 }
 
-.schedules .grid-team{
+.schedules .grid-team {
     max-width: 3.5em;
     overflow: hidden;
     white-space: nowrap;
 }
 
-.table-title h2{
+.table-title h2 {
     margin-top: 1em;
     margin-bottom: 0;
 }
 
-.table-title .clarification{
+.table-title .clarification {
     margin-top: -0.3125em;
     margin-bottom: 0.375em;
 }
 
-.table-title .clarification span{
+.table-title .clarification span {
     font-size: 0.875em;
 }
 
-.blurb-container{
+.blurb-container {
     max-width: 91vw;
 }
 
-.blurb-container ul{
+.blurb-container ul {
     padding-left: 1.25em;
 }
 
-.tier-list-container{
-    .row{
+.tier-list-container {
+    .row {
         display: flex;
         min-height: 4.5em;
         max-width: 95vw;
     }
-    .tier-name{
+
+    .tier-name {
         width: 4.5em;
         border-right: 1px solid black;
         display: flex;
@@ -288,23 +300,29 @@ figure img{
         padding-top: 0.5em;
         padding-bottom: 0.5em;
 
-        button{
+        button {
             margin-top: 0.5em;
+            display: flex;
+            align-items: center;
+            color: black;
         }
     }
-    .options-list{
+
+    .options-list {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5em;
     }
-    .rankings{
+
+    .rankings {
         display: flex;
         flex-wrap: wrap;
         flex-grow: 1;
         padding: 0.25em 0.5em;
         gap: 0.5em 0;
     }
-    .option{
+
+    .option {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -313,12 +331,14 @@ figure img{
             max-width: 5em;
             max-height: 3em;
         }
-        .entity-name{
+
+        .entity-name {
             overflow: hidden;
             width: 4.5em;
             text-align: center;
         }
-        .team-name{
+
+        .team-name {
             font-size: 1rem;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -326,54 +346,62 @@ figure img{
             word-wrap: break-word;
             line-height: 1;
         }
-        .player-name{
+
+        .player-name {
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .entity-name-text{
+
+        .entity-name-text {
             font-size: 0.75em;
         }
     }
-    .ghost{
+
+    .ghost {
         pointer-events: none;
         opacity: 50%;
     }
-    .reorder{
+
+    .reorder {
         position: absolute;
         width: 50%;
         height: 100%;
         top: 0;
     }
-    .reorder.left{
-        left:0;
+
+    .reorder.left {
+        left: 0;
     }
-    .reorder.right{
+
+    .reorder.right {
         right: 0;
     }
-    .last-index{
+
+    .last-index {
         flex-grow: 1;
     }
 
     .tier-name-input {
         width: 100%;
     }
-    .move{
+
+    .move {
         display: flex;
     }
 
-    .trash-can{
+    .trash-can {
         width: 1.25em;
     }
 
-    .controls{
+    .controls {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 }
 
-@media only screen and (max-width: 375px){
-    .trade-container td{
+@media only screen and (max-width: 375px) {
+    .trade-container td {
         font-size: 0.88em;
     }
 }

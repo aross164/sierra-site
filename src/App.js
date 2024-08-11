@@ -22,8 +22,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const rankingsRef = ref(db, 'rankings/2023');
-const sierraId = '989744511347666944';
+const rankingsRef = ref(db, 'rankings/2024');
+const sierraId = '1115440970750861312';
 
 function App(){
     const [teams, setTeams] = useState({});
@@ -31,7 +31,7 @@ function App(){
     const [allRankings, setAllRankings] = useState([]);
     const [scores, setScores] = useState({});
     const [league, setLeague] = useState('');
-    const [season, setSeason] = useState('2023');
+    const [season, setSeason] = useState('2024');
     const location = useLocation();
 
     useEffect(() => {

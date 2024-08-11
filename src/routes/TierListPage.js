@@ -26,6 +26,10 @@ export default function TierListPage(){
     const {teams} = useContext(AppContext);
     // console.log(teams);
 
+    function saveState(){
+        console.log('saved');
+    }
+
     // return <TierList entities={players}/>;
-    return <TierList entities={Object.entries(teams).map(([teamId, team]) => ({...team, id: teamId}))} editable={true} type="team"/>;
+    return <TierList entities={Object.entries(teams).map(([teamId, team]) => ({...team, id: teamId}))} editable={true} type="team" saveState={saveState}/>;
 }

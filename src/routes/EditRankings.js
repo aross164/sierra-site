@@ -3,20 +3,22 @@ import RichEditor from '../components/RichEditor';
 import {convertFromRaw, convertToRaw, EditorState} from 'draft-js';
 import {update} from 'firebase/database';
 import AppContext from '../contexts/AppContext';
+import TierList from '../components/TierList';
+import RankingsEditors from '../components/RankingsEditors';
 
-function EditRankings({week}){
+function EditRankings({week}) {
     const {teams, allRankings, rankingsRef} = useContext(AppContext);
     const [editorStates, setEditorStates] = useState({});
     const [saveButtonText, setSaveButtonText] = useState('Save');
     const [saved, setSaved] = useState(true);
 
     useEffect(() => {
-        if(!allRankings?.length){
+        if (!allRankings?.length) {
             return;
         }
 
-        const stringifiedNewRankings = allRankings?.[week];
-        if(stringifiedNewRankings){
+        const stringifiedNewRankings = allRankings?.[week]?.rankings;
+        if (stringifiedNewRankings) {
             const parsedEditorStates = Object.entries(stringifiedNewRankings).reduce((parsed, [teamId, state]) => {
                 const parsedState = JSON.parse(state);
                 parsed[teamId] = {
@@ -26,7 +28,7 @@ function EditRankings({week}){
                 return parsed;
             }, {});
             setEditorStates(parsedEditorStates);
-        } else{
+        } else {
             const blankEditors = Object.keys(teams).reduce((filledOut, teamId, index) => {
                 filledOut[teamId] = {blurb: EditorState.createEmpty(), ranking: index + 1};
                 return filledOut;
@@ -37,7 +39,7 @@ function EditRankings({week}){
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if(!saved){
+            if (!saved) {
                 saveRankings();
             }
         }, 5000);
@@ -45,40 +47,47 @@ function EditRankings({week}){
         // eslint-disable-next-line
     }, [editorStates, saved]);
 
-    function updateEditorState(teamId, updatedBlurb){
+    function updateEditorState(teamId, updatedBlurb) {
         setSaved(false);
         setEditorStates({...editorStates, [teamId]: {...editorStates[teamId], blurb: updatedBlurb}});
     }
 
-    function moveUp(teamId, ranking){
+    function moveUp(teamId, ranking) {
         moveTeam(teamId, ranking, ranking - 1);
     }
 
-    function moveDown(teamId, ranking){
+    function moveDown(teamId, ranking) {
         moveTeam(teamId, ranking, ranking + 1);
     }
 
-    function moveTeam(teamId, fromRanking, toRanking){
+    function moveTeam(teamId, fromRanking, toRanking) {
         const newEditorState = {...editorStates};
         const displacedTeamId = Object.keys(newEditorState)
-                                    .find(teamId => newEditorState[teamId].ranking === toRanking);
+            .find(teamId => newEditorState[teamId].ranking === toRanking);
         newEditorState[displacedTeamId].ranking = fromRanking;
         newEditorState[teamId].ranking = toRanking;
         setEditorStates(newEditorState);
         setSaved(false);
     }
 
-    async function saveRankings(){
-        const stringifiedEditorStates = Object.entries(editorStates).reduce((stringified, [teamId, state]) => {
+    function getStringifiedEditorStates(states) {
+        let curStates = states;
+        if (!states) {
+            curStates = editorStates;
+        }
+        return Object.entries(curStates).reduce((stringified, [teamId, state]) => {
             stringified[teamId] = JSON.stringify({
                 ...state, blurb: convertToRaw(state.blurb.getCurrentContent())
             });
             return stringified;
         }, {});
+    }
 
-        const newRankings = {
-            [week]: stringifiedEditorStates
-        };
+    async function saveRankings() {
+        const stringifiedEditorStates = getStringifiedEditorStates();
+
+        const newRankings = {};
+        newRankings[`/${week}/rankings`] = stringifiedEditorStates;
 
         setSaveButtonText('Saving...');
         try {
@@ -86,7 +95,8 @@ function EditRankings({week}){
             setSaveButtonText('Updated!');
             setSaved(true);
         } catch (e) {
-            alert('Error saving. Try again or open in new tab.');
+            console.log(e);
+            alert('Error saving rankings. Try again or open in new tab.');
         }
 
         setTimeout(() => {
@@ -94,7 +104,37 @@ function EditRankings({week}){
         }, 1500);
     }
 
-    if(!Object.keys(editorStates).length){
+    async function saveTiers(tiers) {
+        const updates = {};
+        updates[`/${week}/tiers`] = tiers;
+
+        const newEditorStates = {...editorStates};
+        let curRanking = 1;
+        const teamIds = Object.keys(newEditorStates).reduce((o, key) => ({...o, [key]: 1}), {});
+
+        tiers.forEach(tier => tier.entities.forEach(entity => {
+            newEditorStates[entity.id].ranking = curRanking++;
+            delete teamIds[entity.id];
+        }));
+        Object.keys(teamIds).forEach(teamId => newEditorStates[teamId].ranking = curRanking++);
+        updates[`/${week}/rankings`] = getStringifiedEditorStates(newEditorStates);
+
+        setSaveButtonText('Saving...');
+        try {
+            await update(rankingsRef, updates);
+            setSaveButtonText('Updated!');
+            setSaved(true);
+        } catch (e) {
+            console.log(e);
+            alert('Error saving tiers. Try again or open in new tab.');
+        }
+
+        setTimeout(() => {
+            setSaveButtonText('Save');
+        }, 1500);
+    }
+
+    if (!Object.keys(editorStates).length) {
         return <div>Loading</div>;
     }
 
@@ -102,43 +142,16 @@ function EditRankings({week}){
         <>
             <div style={{flexDirection: 'column', paddingRight: '2em'}} className="flex align-center edit-rankings">
                 <h1>Week {week} Rankings</h1>
-                {
-                    Object.entries(editorStates).sort((aTeam, bTeam) => aTeam[1].ranking - bTeam[1].ranking)
-                          .map(([teamId, editorState]) => (
-                              <div className="team-container" key={teamId}>
-                                  <h2 className="flex align-center" style={{flexWrap: 'wrap'}}>
-                                      {editorState.ranking}.
-                                      <span className="flex align-center" style={{marginLeft: '0.25em'}}>
-                                          {teams[teamId]?.avatar ?
-                                              <img src={teams[teamId]?.avatar} className="avatar"
-                                                   alt="avatar"/> : null}
-                                          <div>
-                                              <span>{teams[teamId]?.teamName}</span>
-                                              <div className="team-name">{teams[teamId]?.displayName}</div>
-                                            </div>
-                                      </span>
-                                      <div className="break"/>
-                                      <div className="flex button-container" style={{gap: '0.5em'}}>
-                                          {editorState.ranking !== 1 ?
-                                              <div className="flex align-center">
-                                                  <button onClick={() => moveUp(teamId, editorState.ranking)}>&uarr;
-                                                  </button>
-                                              </div> : null}
-                                          {editorState.ranking !== 12 ? <div className="flex align-center">
-                                              <button
-                                                  onClick={() => moveDown(teamId, editorState.ranking)}>&darr;
-                                              </button>
-                                          </div> : null}
-                                      </div>
-                                  </h2>
-                                  <div className="editor-container">
-                                      <RichEditor editorState={editorState.blurb}
-                                                  setEditorState={(e) => updateEditorState(teamId, e)}/>
-                                  </div>
-                                  {/*<div dangerouslySetInnerHTML={{__html: parsedHtml}}></div>*/}
-                              </div>
-                          ))
-                }
+                <TierList entities={Object.entries(teams).map(([teamId, team]) => ({...team, id: teamId}))} editable
+                          type="team" saveState={saveTiers}
+                          initTiers={[...allRankings?.[week]?.tiers?.map(tier => tier.entities ? tier : {
+                              ...tier,
+                              entities: []
+                          })]}
+                />
+                <RankingsEditors editorStates={editorStates} teams={teams} moveUp={moveUp} moveDown={moveDown}
+                                 updateEditorState={updateEditorState}
+                />
             </div>
             <button className="save-button" onClick={saveRankings} disabled={saved}>{saveButtonText}</button>
         </>

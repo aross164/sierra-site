@@ -17,7 +17,7 @@ function sierraLoader({request}){
     const url = new URL(request.url);
     const league = url.searchParams.get('league');
     if(!league){
-        window.location.replace(`${request.url}?league=989744511347666944`);
+        window.location.replace(`${request.url}?league=1115440970750861312`);
     }
 
     return {};
