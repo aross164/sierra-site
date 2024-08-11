@@ -400,6 +400,12 @@ figure img {
     }
 }
 
+.display-rankings {
+    .tier-list-container {
+        margin-bottom: 1em;
+    }
+}
+
 @media only screen and (max-width: 375px) {
     .trade-container td {
         font-size: 0.88em;

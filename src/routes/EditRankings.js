@@ -1,5 +1,4 @@
 import React, {useContext, useEffect, useState} from 'react';
-import RichEditor from '../components/RichEditor';
 import {convertFromRaw, convertToRaw, EditorState} from 'draft-js';
 import {update} from 'firebase/database';
 import AppContext from '../contexts/AppContext';
