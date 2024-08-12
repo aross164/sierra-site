@@ -177,12 +177,12 @@ export default function TierList({
         newTiers[index].name = e.target.value;
         setTiers(newTiers);
 
-        if(timeoutRef.current){
+        if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
         timeoutRef.current = setTimeout(() => {
             saveState(newTiers);
-        }, 1000)
+        }, 1000);
     }
 
     function moveTier(curIndex, newIndex) {
@@ -348,7 +348,9 @@ function Entity({
                 <div className="reorder left" onDragEnter={e => moveEntityToIndex(e, index)}></div>
                 : null}
             <div className={`option ${ghost ? 'ghost' : ''}`}>
-                <img src={src} alt={alt} draggable="false"/>
+                <img src={src || (entityId === '860080929476034560' ? 'https://i.imgur.com/zHtvTZW.jpeg' : undefined)}
+                     alt={alt} draggable="false"
+                />
                 <div className={`entity-name ${type === 'team' ? 'team-name' : 'player-name'}`}>
                     <span className="entity-name-text">{label}</span>
                 </div>
