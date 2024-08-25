@@ -81,6 +81,9 @@ function App(){
         async function fetchNflWeek(){
             const response = await fetch('https://api.sleeper.app/v1/state/nfl');
             const weekInfo = await response.json();
+            if(weekInfo.season_type === 'pre'){
+                return 1;
+            }
             return weekInfo.week || 18;
         }
 

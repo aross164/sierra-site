@@ -36,7 +36,7 @@ function Rankings() {
     }, [newestWeek]);
 
     useEffect(() => {
-        if (!allRankings?.length) {
+        if (!allRankings?.length || !allRankings[currentWeek]?.rankings) {
             return;
         }
 
