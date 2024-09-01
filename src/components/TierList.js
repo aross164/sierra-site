@@ -218,7 +218,7 @@ export default function TierList({
 
     return (
         <div className="tier-list-container" onDragEnter={hideGhostEntity}>
-            <div className="tier-list">
+            <div className={`tier-list ${editable ? 'editable' : ''}`}>
                 {tiers.map((tier, index) =>
                     <Fragment key={tier.entities.join() + colors[index]}>
                         <div className="tier-name" onDragEnter={hideGhostEntity}

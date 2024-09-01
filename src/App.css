@@ -314,6 +314,10 @@ figure img {
         flex-wrap: wrap;
         flex-grow: 1;
         padding: 0.25em 0.5em;
+        gap: 0.5em 0.25em;
+    }
+
+    .editable .rankings {
         gap: 0.5em;
     }
 
