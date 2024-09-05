@@ -59,7 +59,7 @@ function App(){
             foundUsers[user.user_id] = {
                 teamName: user.metadata.team_name,
                 displayName: user.display_name,
-                avatar: user.metadata.avatar
+                avatar: user.metadata.avatar || ''
             };
 
             return foundUsers;

@@ -148,7 +148,7 @@ export default function TierList({
             return;
         }
         if (ghostIndex === -1) {
-            if (!Object.keys(draggingEntity).length) {
+            if (!(draggingEntity && Object.keys(draggingEntity).length)) {
                 return;
             }
             addGhostEntity(e, tierIndex);
