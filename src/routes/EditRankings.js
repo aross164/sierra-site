@@ -143,7 +143,7 @@ function EditRankings({week}) {
                 <h1>Week {week} Rankings</h1>
                 <TierList entities={Object.entries(teams).map(([teamId, team]) => ({...team, id: teamId}))} editable
                           type="team" saveState={saveTiers}
-                          initTiers={[...allRankings?.[week]?.tiers?.map(tier => tier.entities ? tier : {
+                          initTiers={[...(allRankings?.[week]?.tiers || []).map(tier => tier.entities ? tier : {
                               ...tier,
                               entities: []
                           })]}
