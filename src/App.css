@@ -322,6 +322,7 @@ figure img {
         flex-grow: 1;
         padding: 0.25em 0.5em;
         gap: 0.5em 0.25em;
+        overflow: hidden; /* needed because we're allowing ellipsis overflow to be visible */
     }
 
     .editable .rankings {
@@ -339,18 +340,18 @@ figure img {
         }
 
         .entity-name {
-            overflow: hidden;
+            overflow: visible;
             width: 4.5em;
             text-align: center;
         }
 
         .team-name {
             font-size: 1rem;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             display: -webkit-box;
             word-wrap: break-word;
-            line-height: 1;
+            line-height: 0.75;
         }
 
         .player-name {
