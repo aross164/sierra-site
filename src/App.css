@@ -290,9 +290,9 @@ figure img {
         min-width: 4.5em;
         border-right: 1px solid black;
         display: flex;
-        align-items: center;
         justify-content: center;
         flex-direction: column;
+        text-align: center;
         padding: 0.5em;
 
         button {
@@ -352,7 +352,7 @@ figure img {
         }
 
         .entity-name-text {
-            font-size: 0.75em;
+            font-size: 0.7em;
         }
     }
 
