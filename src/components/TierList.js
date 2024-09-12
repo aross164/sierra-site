@@ -229,7 +229,7 @@ export default function TierList({
                                     <textarea className="tier-name-input" value={tier.name}
                                               onInput={e => updateTierName(e, index)}
                                     ></textarea>
-                                    : tier.name
+                                    : <span className="text">{tier.name}</span>
                             }
                             {
                                 editable ?

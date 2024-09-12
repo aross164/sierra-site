@@ -295,6 +295,13 @@ figure img {
         text-align: center;
         padding: 0.5em;
 
+        .text {
+            font-size: 1.1em;
+            color: white;
+            font-weight: bold;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        }
+
         button {
             margin-top: 0.5em;
             display: flex;
@@ -405,7 +412,7 @@ figure img {
     }
 }
 
-.tier-list{
+.tier-list {
     display: grid;
     grid-template-columns: min-content 1fr;
 }
