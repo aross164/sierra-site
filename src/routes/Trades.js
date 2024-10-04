@@ -80,7 +80,7 @@ function Trades(){
                             let points = weekStats.stats.pts_ppr || 0;
                             if(newPlayers[add.playerId].position === 'QB'){
                                 // sleeper only counts INTs as -1
-                                points -= weekStats.stats.pass_int * 1;
+                                points -= (weekStats.stats.pass_int || 0) * 1;
                             }
                             totalPoints += points;
                         });
