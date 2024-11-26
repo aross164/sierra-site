@@ -300,6 +300,7 @@ figure img {
             font-weight: bold;
             paint-order: stroke fill;
             -webkit-text-stroke: 2px black;
+            letter-spacing: 0.5px;
         }
 
         button {
