@@ -91,7 +91,7 @@ export default function Matchup(props) {
                         <img src={teamsByRosterId[matchup?.t1 || t1]?.avatar} alt="logo"/>
                     </div>
                     :
-                    null}
+                    <div className="img-placeholder"></div>}
                 {getDisplayName(matchup?.t1) || team1 || <span>&nbsp;</span>}
             </div>
             <hr/>
@@ -103,7 +103,7 @@ export default function Matchup(props) {
                         <img src={teamsByRosterId[matchup.t2]?.avatar} alt="logo"/>
                     </div>
                     :
-                    null}
+                    <div className="img-placeholder"></div>}
                 {getDisplayName(matchup?.t2) || team2 || <span>&nbsp;</span>}
             </div>
         </div>

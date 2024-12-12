@@ -420,16 +420,28 @@ figure img {
 }
 
 .bracket-container {
-    .bracket {
-        display: flex;
-        gap: 0.5em;
+    .bracket-grid {
+        display: grid;
+        gap: 0.55em;
+        grid-template-columns: repeat(3, minmax(0, 8em));
+        /*grid-template-rows: repeat(5, 1fr);*/
     }
 
-    .round {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 0.5em;
+    /*.round {*/
+    /*    display: flex;*/
+    /*    flex-direction: column;*/
+    /*    justify-content: center;*/
+    /*    gap: 0.5em;*/
+    /*}*/
+
+    [data-matchup="3"]{
+        grid-row: span 2;
+    }
+    [data-matchup="6"]{
+        grid-row: span 4;
+    }
+    [data-matchup="4"]{
+        grid-row: span 2;
     }
 
     .second-round {
@@ -445,7 +457,10 @@ figure img {
 
 .matchup-container {
     --matchup-border-radius: 5px;
+    display: flex;
+    align-items: center;
     .matchup {
+        width: 100%;
         border: 1px solid black;
         border-radius: var(--matchup-border-radius);
 
@@ -503,7 +518,7 @@ figure img {
         justify-content: center;
     }
 
-    img {
+    img, .img-placeholder {
         border-radius: 50%;
         height: 2em;
     }

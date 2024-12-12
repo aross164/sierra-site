@@ -26,15 +26,15 @@ export default function Bracket(props) {
         newSavedPicks[`/${type}`] = newPicks;
 
         newPicks.forEach((round, index) => {
-            if(index <= matchupIndex) {
+            if (index <= matchupIndex) {
                 return;
             }
-            if(round.w === otherTeam){
+            if (round.w === otherTeam) {
                 round.w = null;
-            } else if(round.l === otherTeam){
+            } else if (round.l === otherTeam) {
                 round.l = null;
             }
-        })
+        });
 
         try {
             await update(bracketRef, newSavedPicks);
@@ -46,40 +46,31 @@ export default function Bracket(props) {
 
     return (<div className="bracket-container">
         <h2>{title}</h2>
-        <div className="bracket">
-            <div className="round first-round">
-                <Matchup t1={bracket[2].t1} teams={teams}/>
-                <Matchup bracket={bracket} matchupIndex={0} picks={picks} savePicks={savePicks} teams={teams}
-                         advance={advance} winning={winning}
-                />
-                <Matchup t1={bracket[3].t1} teams={teams}/>
-                <Matchup bracket={bracket} matchupIndex={1} picks={picks} savePicks={savePicks} teams={teams}
-                         advance={advance} winning={winning}
-                />
-                <Matchup hidden/>
-            </div>
-            <div className="round second-round">
-                {/*<Matchup hidden/>*/}
-                <Matchup bracket={bracket} matchupIndex={2} picks={picks} savePicks={savePicks} teams={teams}
-                         advance={advance} winning={winning}
-                />
-                <Matchup hidden/>
-                <Matchup bracket={bracket} matchupIndex={3} picks={picks} savePicks={savePicks} teams={teams}
-                         advance={advance} winning={winning}
-                />
-                <Matchup bracket={bracket} matchupIndex={4} picks={picks} savePicks={savePicks} teams={teams}
-                         advance="w" winning={winning}
-                />
-            </div>
-            <div className="round third-round">
-                {/*<Matchup hidden />*/}
-                <Matchup bracket={bracket} matchupIndex={5} picks={picks} savePicks={savePicks} teams={teams}
-                         advance={advance} winning={winning}
-                />
-                <Matchup bracket={bracket} matchupIndex={6} picks={picks} savePicks={savePicks} teams={teams}
-                         advance="w" winning={winning}
-                />
-            </div>
+        <div className="bracket-grid">
+            <Matchup t1={bracket[2].t1} teams={teams}/>
+            <Matchup bracket={bracket} matchupIndex={2} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
+            />
+            <Matchup bracket={bracket} matchupIndex={5} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
+            />
+            <Matchup bracket={bracket} matchupIndex={0} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
+            />
+            <Matchup t1={bracket[3].t1} teams={teams}/>
+            <Matchup bracket={bracket} matchupIndex={3} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
+            />
+            <Matchup bracket={bracket} matchupIndex={1} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
+            />
+            <Matchup hidden/>
+            <Matchup bracket={bracket} matchupIndex={4} picks={picks} savePicks={savePicks} teams={teams}
+                     advance="w" winning={winning}
+            />
+            <Matchup bracket={bracket} matchupIndex={6} picks={picks} savePicks={savePicks} teams={teams}
+                     advance="w" winning={winning}
+            />
         </div>
     </div>);
 }
