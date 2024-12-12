@@ -11,6 +11,7 @@ import Rankings from './routes/Rankings';
 import Trades from './routes/Trades';
 import Schedules from './routes/Schedules';
 import TierListPage from './routes/TierListPage';
+import Brackets from './routes/Brackets';
 
 function sierraLoader({request}){
     const url = new URL(request.url);
@@ -123,9 +124,14 @@ const router = createBrowserRouter([
                 element: <EditRankings week={15}/>,
                 loader: sierraLoader
             },
-        {
+            {
                 path: 'list',
                 element: <TierListPage />,
+                loader: sierraLoader
+            },
+            {
+                path: 'brackets',
+                element: <Brackets />,
                 loader: sierraLoader
             },
         ]

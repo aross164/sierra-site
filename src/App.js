@@ -109,7 +109,7 @@ function App(){
 
     return (
         <AppContext.Provider
-            value={{league, newestWeek, teams, allRankings, rankingsRef, season, scores, setScores, sierraId}}>
+            value={{league, newestWeek, teams, allRankings, db, rankingsRef, season, scores, setScores, sierraId}}>
             <div className="app">
                 <Outlet/>
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/>

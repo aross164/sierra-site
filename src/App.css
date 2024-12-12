@@ -419,8 +419,103 @@ figure img {
     grid-template-columns: min-content 1fr;
 }
 
+.bracket-container {
+    .bracket {
+        display: flex;
+        gap: 0.5em;
+    }
+
+    .round {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.5em;
+    }
+
+    .second-round {
+        .matchup-container:is(:first-child, :last-child) {
+            margin-top: auto;
+        }
+    }
+
+    .third-round .matchup-container{
+        margin-top: auto;
+    }
+}
+
+.matchup-container {
+    --matchup-border-radius: 5px;
+    .matchup {
+        border: 1px solid black;
+        border-radius: var(--matchup-border-radius);
+
+        div {
+            text-align: center;
+        }
+    }
+
+    hr {
+        margin: 0;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid black;
+    }
+
+    .team {
+        padding: 10px;
+        cursor: pointer;
+
+        &.first{
+            border-top-right-radius: var(--matchup-border-radius);
+            border-top-left-radius: var(--matchup-border-radius);
+        }
+        &.second{
+            border-bottom-right-radius: var(--matchup-border-radius);
+            border-bottom-left-radius: var(--matchup-border-radius);
+        }
+
+        max-width: 8em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &.hidden {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .split-team {
+        display: inline-block;
+        max-width: 3.75em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .win-advance .advance {
+        background-color: lightgreen;
+    }
+    .loss-advance .advance {
+        background-color: lightcoral;
+    }
+
+    .img-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    img {
+        border-radius: 50%;
+        height: 2em;
+    }
+}
+
 @media only screen and (max-width: 375px) {
     .trade-container td {
         font-size: 0.88em;
+    }
+}
+@media only screen and (max-width: 420px) {
+    .matchup-container .team{
+        max-width: 7em;
     }
 }
