@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React from 'react';
 import Matchup from './Matchup';
 import {update} from 'firebase/database';
 

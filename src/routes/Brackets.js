@@ -43,6 +43,7 @@ export default function Brackets() {
             return;
         }
         fetchBracket();
+        // eslint-disable-next-line
     }, [league]);
 
     async function fetchBracket() {

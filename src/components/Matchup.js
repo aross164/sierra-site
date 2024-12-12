@@ -88,7 +88,7 @@ export default function Matchup(props) {
             >
                 {(t1 || (matchup?.t1 && !Array.isArray(matchup?.t1))) ?
                     <div className="img-container">
-                        <img src={teamsByRosterId[matchup?.t1 || t1]?.avatar}/>
+                        <img src={teamsByRosterId[matchup?.t1 || t1]?.avatar} alt="logo"/>
                     </div>
                     :
                     null}
@@ -100,7 +100,7 @@ export default function Matchup(props) {
             >
                 {(matchup?.t2 && !Array.isArray(matchup?.t2)) ?
                     <div className="img-container">
-                        <img src={teamsByRosterId[matchup.t2]?.avatar}/>
+                        <img src={teamsByRosterId[matchup.t2]?.avatar} alt="logo"/>
                     </div>
                     :
                     null}
