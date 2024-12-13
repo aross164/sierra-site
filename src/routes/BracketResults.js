@@ -24,6 +24,10 @@ export default function BracketResults() {
     }, [db]);
 
     useEffect(() => {
+        if(!Object.values(brackets).length || !Object.values(teams).length) {
+            return;
+        }
+
         const init = Object.entries(teams).reduce((result, [userId, team]) => {
             result[team.rosterId] = {
                 userId,
@@ -92,7 +96,7 @@ export default function BracketResults() {
             return results;
         }, init);
         setTeamResults(newResults);
-    }, [brackets]);
+    }, [brackets, teams]);
 
     if (!Object.keys(brackets).length) {
         return <div>Adding up bracket results...</div>;
