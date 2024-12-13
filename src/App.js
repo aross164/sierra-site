@@ -148,7 +148,8 @@ function App(){
                         <Link to={`/bracketresults?league=${league}`} className="footerPage">
                             <div>Brackets</div>
                             {
-                                location.pathname === '/bracketresults' && <div className="activePage"/>
+                                (location.pathname === '/' || location.pathname.includes('bracketresults')) &&
+                                <div className="activePage"/>
                             }
                         </Link>
                     </footer>
