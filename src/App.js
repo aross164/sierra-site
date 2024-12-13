@@ -142,6 +142,15 @@ function App(){
                                 location.pathname === '/schedules' && <div className="activePage"/>
                             }
                         </Link>
+                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                        </div>
+                        <Link to={`/bracketresults?league=${league}`} className="footerPage">
+                            <div>Brackets</div>
+                            {
+                                location.pathname === '/bracketresults' && <div className="activePage"/>
+                            }
+                        </Link>
                     </footer>
                     : null
             }

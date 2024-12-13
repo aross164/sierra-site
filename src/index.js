@@ -12,6 +12,7 @@ import Trades from './routes/Trades';
 import Schedules from './routes/Schedules';
 import TierListPage from './routes/TierListPage';
 import Brackets from './routes/Brackets';
+import BracketResults from './routes/BracketResults';
 
 function sierraLoader({request}){
     const url = new URL(request.url);
@@ -132,6 +133,11 @@ const router = createBrowserRouter([
             {
                 path: 'brackets',
                 element: <Brackets />,
+                loader: sierraLoader
+            },
+            {
+                path: 'bracketresults',
+                element: <BracketResults />,
                 loader: sierraLoader
             },
         ]

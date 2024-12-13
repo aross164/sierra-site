@@ -32,7 +32,7 @@ export default function Brackets() {
             return;
         }
 
-        onValue(bracketRef, snapshot => {
+         return onValue(bracketRef, snapshot => {
             const data = snapshot.val();
             setPicks(data);
         });
