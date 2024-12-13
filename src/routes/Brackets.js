@@ -14,25 +14,26 @@ export default function Brackets() {
         return curTeams;
     }, {});
 
+    const user = new URLSearchParams(window.location.search).get('user');
+    const otherUser = new URLSearchParams(window.location.search).get('otherUser');
     useEffect(() => {
-        const user = new URLSearchParams(window.location.search).get('user');
-        if(!user || !db || !season){
+        if (!(user || otherUser) || !db || !season) {
             return;
         }
-        if(Object.keys(teams).length && !teams[user]) {
-            alert('Wrong user id')
+        if (Object.keys(teams).length && !teams[user || otherUser]) {
+            alert('Wrong user id');
             return;
         }
 
-        setBracketRef(ref(db, `brackets/${season}/${user}`));
-    }, [db, season, teams]);
+        setBracketRef(ref(db, `brackets/${season}/${user || otherUser}`));
+    }, [db, season, teams, user, otherUser]);
 
     useEffect(() => {
-        if(!bracketRef){
+        if (!bracketRef) {
             return;
         }
 
-         return onValue(bracketRef, snapshot => {
+        return onValue(bracketRef, snapshot => {
             const data = snapshot.val();
             setPicks(data);
         });
@@ -60,8 +61,12 @@ export default function Brackets() {
     }
 
     return (<div>
-        <Bracket bracket={winnersBracket} bracketRef={bracketRef} picks={picks?.winning} teams={teamsByRosterId} title="Winner's Bracket" winning/>
+        <Bracket bracket={winnersBracket} bracketRef={bracketRef} picks={picks?.winning} teams={teamsByRosterId}
+                 title="Winner's Bracket" winning editable={user}
+        />
         <div style={{marginTop: '4em'}}></div>
-        <Bracket bracket={losersBracket} bracketRef={bracketRef} picks={picks?.losing} teams={teamsByRosterId} title="Losers's Bracket"/>
+        <Bracket bracket={losersBracket} bracketRef={bracketRef} picks={picks?.losing} teams={teamsByRosterId}
+                 title="Losers's Bracket" editable={user}
+        />
     </div>);
 }

@@ -1,9 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
 import AppContext from '../contexts/AppContext';
 import {child, get, ref} from 'firebase/database';
+import {Link} from 'react-router-dom';
 
 export default function BracketResults() {
-    const {db, teams} = useContext(AppContext);
+    const {db, league, teams} = useContext(AppContext);
     const [brackets, setBrackets] = useState({});
     const [teamResults, setTeamResults] = useState([]);
 
@@ -24,7 +25,7 @@ export default function BracketResults() {
     }, [db]);
 
     useEffect(() => {
-        if(!Object.values(brackets).length || !Object.values(teams).length) {
+        if (!Object.values(brackets).length || !Object.values(teams).length) {
             return;
         }
 
@@ -138,7 +139,14 @@ export default function BracketResults() {
                     }
                     return 0;
                 }).map((totals) => <tr key={totals.userId}>
-                    <td data-user={totals.userId}>{teams[totals.userId]?.displayName}</td>
+                    <td data-user={totals.userId}>
+                        {brackets[totals.userId] ?
+                            <Link to={`/brackets?league=${league}&otherUser=${totals.userId}`}>
+                                {teams[totals.userId]?.displayName}
+                            </Link>
+                            : teams[totals.userId]?.displayName
+                        }
+                    </td>
                     <td>{(totals.total / Object.keys(brackets).length).toFixed(1)}</td>
                     <td>{totals.trophies}</td>
                 </tr>)}

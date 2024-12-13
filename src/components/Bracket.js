@@ -3,12 +3,12 @@ import Matchup from './Matchup';
 import {update} from 'firebase/database';
 
 export default function Bracket(props) {
-    const {bracket, bracketRef, picks, teams, title, winning} = props;
+    const {bracket, bracketRef, editable, picks, teams, title, winning} = props;
 
     const advance = winning ? 'w' : 'l';
 
     async function savePicks(matchupNum, team, otherTeam, curAdvance) {
-        if (!bracketRef) {
+        if (!editable || !bracketRef) {
             return;
         }
 
