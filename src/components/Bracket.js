@@ -48,25 +48,26 @@ export default function Bracket(props) {
         <h2>{title}</h2>
         <div className="bracket-grid">
             <Matchup t1={bracket[2].t1} teams={teams}/>
-            <Matchup bracket={bracket} matchupIndex={2} picks={picks} savePicks={savePicks} teams={teams}
-                     advance={advance} winning={winning}
-            />
-            <Matchup bracket={bracket} matchupIndex={5} picks={picks} savePicks={savePicks} teams={teams}
-                     advance={advance} winning={winning}
-            />
             <Matchup bracket={bracket} matchupIndex={0} picks={picks} savePicks={savePicks} teams={teams}
                      advance={advance} winning={winning}
             />
             <Matchup t1={bracket[3].t1} teams={teams}/>
-            <Matchup bracket={bracket} matchupIndex={3} picks={picks} savePicks={savePicks} teams={teams}
-                     advance={advance} winning={winning}
-            />
             <Matchup bracket={bracket} matchupIndex={1} picks={picks} savePicks={savePicks} teams={teams}
                      advance={advance} winning={winning}
             />
-            <Matchup hidden/>
+
+            <Matchup bracket={bracket} matchupIndex={2} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
+            />
+            <Matchup bracket={bracket} matchupIndex={3} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
+            />
             <Matchup bracket={bracket} matchupIndex={4} picks={picks} savePicks={savePicks} teams={teams}
                      advance="w" winning={winning}
+            />
+
+            <Matchup bracket={bracket} matchupIndex={5} picks={picks} savePicks={savePicks} teams={teams}
+                     advance={advance} winning={winning}
             />
             <Matchup bracket={bracket} matchupIndex={6} picks={picks} savePicks={savePicks} teams={teams}
                      advance="w" winning={winning}
