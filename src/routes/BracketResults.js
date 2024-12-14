@@ -41,57 +41,34 @@ export default function BracketResults() {
         const newResults = Object.values(brackets).reduce((results, userBrackets) => {
             const {winning, losing} = userBrackets;
             winning.forEach(round => {
-                if (round.m === 6) {
-                    results[round.w].total += 1;
+                if(!round.p){
+                    return;
+                }
+                if (round.p === 1) {
                     results[round.w].trophies += 1;
-                    results[round.l].total += 2;
-                    return;
                 }
-                if (round.m === 7) {
-                    if (round.w) {
-                        results[round.w].total += 3;
-                        results[round.l].total += 4;
-                    } else {
-                        results[winning[round.t1_from.l - 1].l].total += 3.5;
-                        results[winning[round.t2_from.l - 1].l].total += 3.5;
-                    }
-                    return;
-                }
-                if (round.m === 5) {
-                    if (round.w && results[round.w]) {
-                        results[round.w].total += 5;
-                        results[round.l].total += 6;
-                    } else {
-                        results[winning[round.t1_from.l - 1].l].total += 5.5;
-                        results[winning[round.t2_from.l - 1].l].total += 5.5;
-                    }
+                if(round.w){
+                    results[round.w].total += round.p
+                    results[round.l].total += round.p + 1;
+                } else {
+                    results[winning[round.t1_from.l - 1].l].total += round.p + 0.5;
+                    results[winning[round.t2_from.l - 1].l].total += round.p + 0.5;
                 }
             });
             losing.forEach(round => {
-                if (round.m === 6) {
-                    results[round.w].total += 11;
-                    results[round.l].total += 12;
+                if(!round.p) {
+                    return;
+                }
+                // losers bracket still uses 1st/3rd/5th places games, so subtract from 12 to get place
+                if (round.p === 1) {
                     results[round.l].trophies += 1;
-                    return;
                 }
-                if (round.m === 7) {
-                    if (round.w) {
-                        results[round.w].total += 9;
-                        results[round.l].total += 10;
-                    } else {
-                        results[losing[round.t1_from.l - 1].w].total += 9.5;
-                        results[losing[round.t2_from.l - 1].w].total += 9.5;
-                    }
-                    return;
-                }
-                if (round.m === 5) {
-                    if (round.w) {
-                        results[round.w].total += 7;
-                        results[round.l].total += 8;
-                    } else {
-                        results[losing[round.t1_from.l - 1].w].total += 7.5;
-                        results[losing[round.t2_from.l - 1].w].total += 7.5;
-                    }
+                if(round.w){
+                    results[round.w].total += 12 - round.p;
+                    results[round.l].total += 12 - round.p + 1;
+                } else {
+                    results[losing[round.t1_from.l - 1].w].total += 12 - round.p + 0.5;
+                    results[losing[round.t2_from.l - 1].w].total += 12 - round.p + 0.5;
                 }
             });
             return results;
