@@ -137,6 +137,8 @@ footer a {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .activePage {

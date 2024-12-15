@@ -62,7 +62,7 @@ export default function Brackets() {
 
     return (<div>
         {
-            otherUser ? <h1>{`${teams[otherUser].displayName}'s Bracket`}</h1> : null
+            otherUser ? <h1>{`${teams[otherUser]?.displayName}'s Bracket`}</h1> : null
         }
         <Bracket bracket={winnersBracket} bracketRef={bracketRef} picks={picks?.winning} teams={teamsByRosterId}
                  title="Winner's Bracket" winning editable={user}
