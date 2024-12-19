@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function Matchup(props) {
-    const {advance, bracket, hidden, matchupIndex, picks, savePicks, t1, teams, winning} = props;
+    const {advance, bracket, matchupIndex, picks, savePicks, t1, teams, winning} = props;
     const teamsByRosterId = Object.entries(teams || {}).reduce((curTeams, [userId, team]) => {
         curTeams[team.rosterId] = {...team, userId: userId, teamId: team.id};
         return curTeams;
@@ -81,8 +81,14 @@ export default function Matchup(props) {
         savePicks(matchup.m, team, matchup.t1 === team ? matchup.t2 : matchup.t1, advance);
     }
 
-    return (<div className={`matchup-container ${hidden ? 'hidden' : ''}`} data-matchup={matchup?.m}>
-        <div className={`matchup ${advance === 'w' ? 'win-advance' : 'loss-advance'}`}>
+    const advancer = bracket?.[matchupIndex].w;
+
+    return (<div
+        className={`matchup-container`} data-matchup={matchup?.m}
+    >
+        <div
+            className={`matchup ${advance === 'w' ? 'win-advance' : 'loss-advance'} ${picks && advancer && picks[matchupIndex][advance] === Number(advancer) ? 'correct' : ''} ${picks && advancer && picks[matchupIndex][advance] !== Number(advancer) ? 'incorrect' : ''}`}
+        >
             <div className={`team first ${(matchup?.t1 && matchup.t1 === matchup[advance]) ? 'advance' : ''}`}
                  onClick={() => updatePick(matchup?.t1)} data-team={matchup?.t1}
             >

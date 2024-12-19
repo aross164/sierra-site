@@ -477,6 +477,23 @@ figure img {
         border: 1px solid black;
         border-radius: var(--matchup-border-radius);
 
+        &.correct {
+            border: 2px solid green;
+        }
+        &.incorrect {
+            border: 2px solid red;
+        }
+        &:is(.correct, .incorrect){
+            .team.first{
+                border-top-right-radius: calc(var(--matchup-border-radius) - 2px);
+                border-top-left-radius: calc(var(--matchup-border-radius) - 2px);
+            }
+            .team.second{
+                border-bottom-right-radius: calc(var(--matchup-border-radius) - 2px);
+                border-bottom-left-radius: calc(var(--matchup-border-radius) - 2px);
+            }
+        }
+
         div {
             text-align: center;
         }
@@ -494,12 +511,12 @@ figure img {
         cursor: pointer;
 
         &.first{
-            border-top-right-radius: var(--matchup-border-radius);
-            border-top-left-radius: var(--matchup-border-radius);
+            border-top-right-radius: calc(var(--matchup-border-radius) - 1px);
+            border-top-left-radius: calc(var(--matchup-border-radius) - 1px);
         }
         &.second{
-            border-bottom-right-radius: var(--matchup-border-radius);
-            border-bottom-left-radius: var(--matchup-border-radius);
+            border-bottom-right-radius: calc(var(--matchup-border-radius) - 1px);
+            border-bottom-left-radius: calc(var(--matchup-border-radius) - 1px);
         }
 
         max-width: 8em;
@@ -538,6 +555,10 @@ figure img {
 }
 
 .bracket-results {
+    h2 {
+        text-align: center;
+    }
+
     .table-container {
         display: flex;
         justify-content: center;
