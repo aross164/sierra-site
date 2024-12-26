@@ -51,6 +51,7 @@ export default function BracketResults() {
 
         const newResults = Object.entries(brackets).reduce((results, [userId, userBrackets]) => {
             const {winning, losing} = userBrackets;
+            //TODO: abstact the scoring logic for winners/losers bracket
             winning.forEach((round, index) => {
                 if (!round.p || round.p === 1) {
                     if (round.w === winnersBracket[index].w) {
@@ -64,10 +65,12 @@ export default function BracketResults() {
                 } else {
                     if (round.w === winnersBracket[index].w) {
                         newScores[userId].total += 10;
-                    } else if (round.p === 5 && ![winnersBracket[0].w, winnersBracket[1].w].includes(round.w)) {
-                        newScores[userId].winnersPotential += 10;
-                    } else if (round.p === 3 && ![winnersBracket[0].l, winnersBracket[1].l, winnersBracket[2].w, winnersBracket[3].w].includes(round.w)) {
-                        newScores[userId].winnersPotential += 10;
+                    } else if(!winnersBracket[index].w){
+                        if (round.p === 5 && round.w && ![winnersBracket[0].w, winnersBracket[1].w].includes(round.w)) {
+                            newScores[userId].winnersPotential += 10;
+                        } else if (round.p === 3 && round.w && ![winnersBracket[0].l, winnersBracket[1].l, winnersBracket[2].w, winnersBracket[3].w].includes(round.w)) {
+                            newScores[userId].winnersPotential += 10;
+                        }
                     }
                 }
 
@@ -98,10 +101,12 @@ export default function BracketResults() {
                 } else {
                     if (round.w === losersBracket[index].w) {
                         newScores[userId].total += 10;
-                    } else if (round.p === 5 && ![losersBracket[0].w, losersBracket[1].w].includes(round.w)) {
-                        newScores[userId].losersPotential += 10;
-                    } else if (round.p === 3 && ![losersBracket[0].l, losersBracket[1].l, losersBracket[2].w, losersBracket[3].w].includes(round.w)) {
-                        newScores[userId].losersPotential += 10;
+                    } else if (!losersBracket[index].w){
+                        if (round.p === 5 && round.w && ![losersBracket[0].w, losersBracket[1].w].includes(round.w)) {
+                            newScores[userId].losersPotential += 10;
+                        } else if (round.p === 3 && round.w && ![losersBracket[0].l, losersBracket[1].l, losersBracket[2].w, losersBracket[3].w].includes(round.w)) {
+                            newScores[userId].losersPotential += 10;
+                        }
                     }
                 }
 
@@ -217,7 +222,7 @@ export default function BracketResults() {
                         return 1;
                     }
                     return 0;
-                }).filter(totals => totals.total + totals.winnersPotential + totals.losersPotential).map((totals) => <tr
+                }).filter(totals => totals.total + totals.winnersPotential + totals.losersPotential + totals.eliminated.length).map((totals) => <tr
                     key={totals.userId}
                 >
                     <td data-user={totals.userId}>
