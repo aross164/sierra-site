@@ -4,7 +4,7 @@ import {child, get, ref} from 'firebase/database';
 import {Link} from 'react-router-dom';
 
 export default function BracketResults() {
-    const {db, league, teams} = useContext(AppContext);
+    const {db, league, season, teams} = useContext(AppContext);
     const [brackets, setBrackets] = useState({});
     const [teamResults, setTeamResults] = useState({});
     const [bracketPoints, setBracketPoints] = useState({});
@@ -18,14 +18,14 @@ export default function BracketResults() {
 
         const dbRef = ref(db);
         try {
-            get(child(dbRef, 'brackets/2024')).then(snapshot => {
+            get(child(dbRef, `brackets/${season}`)).then(snapshot => {
                 if (snapshot.exists()) {
                     setBrackets(snapshot.val());
                 }
             });
         } catch (err) {
         }
-    }, [db]);
+    }, [db, season]);
 
     useEffect(() => {
         if (!Object.values(brackets).length || !Object.values(teams).length || !winnersBracket || !losersBracket) {

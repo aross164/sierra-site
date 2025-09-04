@@ -243,6 +243,10 @@ function Schedules(){
         </>);
     }
 
+    if(newestWeek === 1){
+        return <div>No games played yet</div>
+    }
+
     if(!Object.keys(scores).length || !Object.keys(Object.values(scores)[0].positionScores).length || !Object.keys(whatIfScores).length || !leagues){
         return <div>Loading...</div>;
     }

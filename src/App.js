@@ -22,8 +22,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const rankingsRef = ref(db, 'rankings/2024');
-const sierraId = '1115440970750861312';
+const year = '2025';
+const rankingsRef = ref(db, `rankings/${year}`);
+const sierraId = '1244742207345270784';
 
 function App(){
     const [teams, setTeams] = useState({});
@@ -31,7 +32,7 @@ function App(){
     const [allRankings, setAllRankings] = useState([]);
     const [scores, setScores] = useState({});
     const [league, setLeague] = useState('');
-    const [season, setSeason] = useState('2024');
+    const [season, setSeason] = useState(year);
     const location = useLocation();
 
     useEffect(() => {
@@ -142,7 +143,7 @@ function App(){
                                 location.pathname === '/schedules' && <div className="activePage"/>
                             }
                         </Link>
-                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                        {/*<div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
                             <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
                         </div>
                         <Link to={`/bracketresults?league=${league}`} className="footerPage">
@@ -151,7 +152,7 @@ function App(){
                                 (location.pathname === '/' || location.pathname.includes('bracketresults')) &&
                                 <div className="activePage"/>
                             }
-                        </Link>
+                        </Link>*/}
                     </footer>
                     : null
             }
