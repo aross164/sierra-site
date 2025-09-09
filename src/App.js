@@ -24,9 +24,8 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const year = '2025';
 const rankingsRef = ref(db, `rankings/${year}`);
-const sierraId = '1244742207345270784';
 
-function App(){
+function App({sierraId}) {
     const [teams, setTeams] = useState({});
     const [newestWeek, setNewestWeek] = useState(0);
     const [allRankings, setAllRankings] = useState([]);
