@@ -142,7 +142,7 @@ function App({sierraId}) {
                                 location.pathname === '/schedules' && <div className="activePage"/>
                             }
                         </Link>
-                        {/*<div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
                             <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
                         </div>
                         <Link to={`/bracketresults?league=${league}`} className="footerPage">
@@ -151,7 +151,7 @@ function App({sierraId}) {
                                 (location.pathname === '/' || location.pathname.includes('bracketresults')) &&
                                 <div className="activePage"/>
                             }
-                        </Link>*/}
+                        </Link>
                     </footer>
                     : null
             }
