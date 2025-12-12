@@ -77,15 +77,21 @@ export default function BracketResults() {
                 if (!round.p) {
                     return;
                 }
-                if (round.p === 1) {
+                if (round.p === 1 && round.w) {
                     results[round.w].trophies += 1;
                 }
                 if (round.w) {
                     results[round.w].total += round.p;
-                    results[round.l].total += round.p + 1;
+                    if(round.l){
+                        results[round.l].total += round.p + 1;
+                    }
                 } else {
-                    results[winning[round.t1_from.l - 1].l].total += round.p + 0.5;
-                    results[winning[round.t2_from.l - 1].l].total += round.p + 0.5;
+                    if(round.t1_from.l){
+                        results[winning[round.t1_from.l - 1].l].total += round.p + 0.5;
+                    }
+                    if(round.t2_from.l){
+                        results[winning[round.t2_from.l - 1].l].total += round.p + 0.5;
+                    }
                 }
             });
             losing.forEach((round, index) => {
