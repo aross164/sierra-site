@@ -1,18 +1,42 @@
 import React, {useContext, useEffect, useState} from 'react';
 import AppContext from '../contexts/AppContext';
 import {child, get, ref} from 'firebase/database';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import WaSelect from '@awesome.me/webawesome/dist/react/select/index.js';
+import WaOption from '@awesome.me/webawesome/dist/react/option/index.js';
+import useWaSelectChange from '../hooks/useWaSelectChange';
+import {scoreBrackets} from '../utils/bracketScoring';
 
 export default function BracketResults() {
-    const {db, league, season, teams} = useContext(AppContext);
+    const {db, league, teams, season, sierraLeagueIds, bracketLeagueOptions} = useContext(AppContext);
     const [brackets, setBrackets] = useState({});
     const [teamResults, setTeamResults] = useState({});
     const [bracketPoints, setBracketPoints] = useState({});
     const [winnersBracket, setWinnersBracket] = useState(null);
     const [losersBracket, setLosersBracket] = useState(null);
+    const navigate = useNavigate();
+
+    if (league && sierraLeagueIds && !sierraLeagueIds.includes(league)) {
+        window.location.replace(`${window.location.origin}/schedules?league=${league}`);
+    }
+
+    const seasonSelectRef = useWaSelectChange(
+        selectedLeague => navigate(`/bracketresults?league=${selectedLeague}`)
+    );
+
+    const selectedSeasonLeague = bracketLeagueOptions?.some(([, optionLeague]) => optionLeague === league) ? league : undefined;
+
+    const seasonSelect = bracketLeagueOptions?.length > 1 && (
+        <WaSelect ref={seasonSelectRef} label="Season" value={selectedSeasonLeague} placeholder="Select a season"
+                  style={{maxWidth: '10em', marginBottom: '1em'}}>
+            {bracketLeagueOptions.map(([optionSeason, optionLeague]) => (
+                <WaOption key={optionLeague} value={optionLeague}>{optionSeason}</WaOption>
+            ))}
+        </WaSelect>
+    );
 
     useEffect(() => {
-        if (!db) {
+        if (!db || !season) {
             return;
         }
 
@@ -22,8 +46,9 @@ export default function BracketResults() {
                 if (snapshot.exists()) {
                     setBrackets(snapshot.val());
                 }
-            });
+            }).catch(err => console.error('Failed to fetch brackets:', err));
         } catch (err) {
+            console.error('Failed to fetch brackets:', err);
         }
     }, [db, season]);
 
@@ -32,107 +57,7 @@ export default function BracketResults() {
             return;
         }
 
-        const newScores = {};
-        const init = Object.entries(teams).reduce((result, [userId, team]) => {
-            result[team.rosterId] = {
-                userId,
-                total: 0,
-                trophies: 0
-            };
-            newScores[userId] = {
-                userId,
-                total: 0,
-                winnersPotential: 0,
-                losersPotential: 0,
-                eliminated: [],
-            };
-            return result;
-        }, {});
-
-        const newResults = Object.entries(brackets).reduce((results, [userId, userBrackets]) => {
-            const {winning, losing} = userBrackets;
-            //TODO: abstact the scoring logic for winners/losers bracket
-            winning.forEach((round, index) => {
-                if (!round.p || round.p === 1) {
-                    if (round.w === winnersBracket[index].w) {
-                        newScores[userId].total += 2 ** (round.r - 1) * 10;
-                    }
-                    if (winnersBracket[index].l) {
-                        newScores[userId].eliminated.push(winnersBracket[index].l);
-                    } else if (!newScores[userId].eliminated.includes(round.w)) {
-                        newScores[userId].winnersPotential += 2 ** (round.r - 1) * 10;
-                    }
-                } else {
-                    if (round.w === winnersBracket[index].w) {
-                        newScores[userId].total += 10;
-                    } else if(!winnersBracket[index].w){
-                        if (round.p === 5 && round.w && ![winnersBracket[0].w, winnersBracket[1].w].includes(round.w)) {
-                            newScores[userId].winnersPotential += 10;
-                        } else if (round.p === 3 && round.w && ![winnersBracket[0].l, winnersBracket[1].l, winnersBracket[2].w, winnersBracket[3].w].includes(round.w)) {
-                            newScores[userId].winnersPotential += 10;
-                        }
-                    }
-                }
-
-                if (!round.p) {
-                    return;
-                }
-                if (round.p === 1 && round.w) {
-                    results[round.w].trophies += 1;
-                }
-                if (round.w) {
-                    results[round.w].total += round.p;
-                    if(round.l){
-                        results[round.l].total += round.p + 1;
-                    }
-                } else {
-                    if(round.t1_from.l){
-                        results[winning[round.t1_from.l - 1].l].total += round.p + 0.5;
-                    }
-                    if(round.t2_from.l){
-                        results[winning[round.t2_from.l - 1].l].total += round.p + 0.5;
-                    }
-                }
-            });
-            losing.forEach((round, index) => {
-                if (!round.p || round.p === 1) {
-                    if (round.l === losersBracket[index].w) {
-                        newScores[userId].total += 2 ** (round.r - 1) * 10;
-                    }
-                    if (losersBracket[index].l) {
-                        newScores[userId].eliminated.push(losersBracket[index].l);
-                    } else if (!newScores[userId].eliminated.includes(round.l)) {
-                        newScores[userId].losersPotential += 2 ** (round.r - 1) * 10;
-                    }
-                } else {
-                    if (round.w === losersBracket[index].w) {
-                        newScores[userId].total += 10;
-                    } else if (!losersBracket[index].w){
-                        if (round.p === 5 && round.w && ![losersBracket[0].w, losersBracket[1].w].includes(round.w)) {
-                            newScores[userId].losersPotential += 10;
-                        } else if (round.p === 3 && round.w && ![losersBracket[0].l, losersBracket[1].l, losersBracket[2].w, losersBracket[3].w].includes(round.w)) {
-                            newScores[userId].losersPotential += 10;
-                        }
-                    }
-                }
-
-                if (!round.p) {
-                    return;
-                }
-                // losers bracket still uses 1st/3rd/5th places games, so subtract from 12 to get place
-                if (round.p === 1) {
-                    results[round.l].trophies += 1;
-                }
-                if (round.w) {
-                    results[round.w].total += 12 - round.p;
-                    results[round.l].total += 12 - round.p + 1;
-                } else {
-                    results[losing[round.t1_from.l - 1].w].total += 12 - round.p + 0.5;
-                    results[losing[round.t2_from.l - 1].w].total += 12 - round.p + 0.5;
-                }
-            });
-            return results;
-        }, init);
+        const {bracketPoints: newScores, teamResults: newResults} = scoreBrackets(brackets, teams, winnersBracket, losersBracket);
         setBracketPoints(newScores);
         setTeamResults(newResults);
     }, [brackets, teams, winnersBracket, losersBracket]);
@@ -141,25 +66,29 @@ export default function BracketResults() {
         if (!league) {
             return;
         }
+
+        async function fetchBracket() {
+            const winnersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/winners_bracket`);
+            const losersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/losers_bracket`);
+            const [winnerBracketJson, losersBracketJson] = await Promise.all([winnersBracketRes, losersBracketRes]);
+            const [curWinnersBracket, curLosersBracket] = await Promise.all([winnerBracketJson.json(), losersBracketJson.json()]);
+            setWinnersBracket(curWinnersBracket);
+            setLosersBracket(curLosersBracket);
+        }
+
         fetchBracket();
-        // eslint-disable-next-line
     }, [league]);
 
-    async function fetchBracket() {
-        const winnersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/winners_bracket`);
-        const losersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/losers_bracket`);
-        const [winnerBracketJson, losersBracketJson] = await Promise.all([winnersBracketRes, losersBracketRes]);
-        const [curWinnersBracket, curLosersBracket] = await Promise.all([winnerBracketJson.json(), losersBracketJson.json()]);
-        setWinnersBracket(curWinnersBracket);
-        setLosersBracket(curLosersBracket);
-    }
-
     if (!Object.keys(brackets).length) {
-        return <div>Adding up bracket results...</div>;
+        return (<div>
+            {seasonSelect}
+            <div>Adding up bracket results...</div>
+        </div>);
     }
 
     return (<div className="bracket-results">
         <h1>Bracket Results</h1>
+        <div style={{display: 'flex', justifyContent: 'center'}}>{seasonSelect}</div>
         <h2>Predictions</h2>
         <div className="table-container">
             <table>

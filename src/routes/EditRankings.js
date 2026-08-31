@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {convertFromRaw, convertToRaw, EditorState} from 'draft-js';
 import {update} from 'firebase/database';
 import AppContext from '../contexts/AppContext';
@@ -36,6 +36,40 @@ function EditRankings({week}) {
         }
     }, [week, allRankings, teams]);
 
+    const getStringifiedEditorStates = useCallback((states) => {
+        let curStates = states;
+        if (!states) {
+            curStates = editorStates;
+        }
+        return Object.entries(curStates).reduce((stringified, [teamId, state]) => {
+            stringified[teamId] = JSON.stringify({
+                ...state, blurb: convertToRaw(state.blurb.getCurrentContent())
+            });
+            return stringified;
+        }, {});
+    }, [editorStates]);
+
+    const saveRankings = useCallback(async () => {
+        const stringifiedEditorStates = getStringifiedEditorStates();
+
+        const newRankings = {};
+        newRankings[`/${week}/rankings`] = stringifiedEditorStates;
+
+        setSaveButtonText('Saving...');
+        try {
+            await update(rankingsRef, newRankings);
+            setSaveButtonText('Updated!');
+            setSaved(true);
+        } catch (e) {
+            console.log(e);
+            alert('Error saving rankings. Try again or open in new tab.');
+        }
+
+        setTimeout(() => {
+            setSaveButtonText('Save');
+        }, 1500);
+    }, [getStringifiedEditorStates, week, rankingsRef]);
+
     useEffect(() => {
         const interval = setInterval(() => {
             if (!saved) {
@@ -43,8 +77,7 @@ function EditRankings({week}) {
             }
         }, 5000);
         return () => clearInterval(interval);
-        // eslint-disable-next-line
-    }, [editorStates, saved]);
+    }, [saved, saveRankings]);
 
     function updateEditorState(teamId, updatedBlurb) {
         setSaved(false);
@@ -67,40 +100,6 @@ function EditRankings({week}) {
         newEditorState[teamId].ranking = toRanking;
         setEditorStates(newEditorState);
         setSaved(false);
-    }
-
-    function getStringifiedEditorStates(states) {
-        let curStates = states;
-        if (!states) {
-            curStates = editorStates;
-        }
-        return Object.entries(curStates).reduce((stringified, [teamId, state]) => {
-            stringified[teamId] = JSON.stringify({
-                ...state, blurb: convertToRaw(state.blurb.getCurrentContent())
-            });
-            return stringified;
-        }, {});
-    }
-
-    async function saveRankings() {
-        const stringifiedEditorStates = getStringifiedEditorStates();
-
-        const newRankings = {};
-        newRankings[`/${week}/rankings`] = stringifiedEditorStates;
-
-        setSaveButtonText('Saving...');
-        try {
-            await update(rankingsRef, newRankings);
-            setSaveButtonText('Updated!');
-            setSaved(true);
-        } catch (e) {
-            console.log(e);
-            alert('Error saving rankings. Try again or open in new tab.');
-        }
-
-        setTimeout(() => {
-            setSaveButtonText('Save');
-        }, 1500);
     }
 
     async function saveTiers(tiers) {

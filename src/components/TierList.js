@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useCallback, useEffect, useRef, useState} from 'react';
 import 'drag-drop-touch';
 
 const colors = [
@@ -42,13 +42,13 @@ export default function TierList({
     }, entities);
     const timeoutRef = useRef(null);
 
-    function getTiersCopy(passedTiers) {
+    const getTiersCopy = useCallback((passedTiers) => {
         let newTiers = passedTiers;
         if (!newTiers) {
             newTiers = structuredClone(tiers);
         }
         return newTiers;
-    }
+    }, [tiers]);
 
     function addGhostEntity(e, tierIndex) {
         e?.stopPropagation();
@@ -68,7 +68,7 @@ export default function TierList({
         setTiers(newTiers);
     }
 
-    function removeGhostEntities() {
+    const removeGhostEntities = useCallback(() => {
         const newTiers = getTiersCopy();
         newTiers.forEach(tier => {
             tier.entities = tier.entities.filter(entity => {
@@ -79,7 +79,7 @@ export default function TierList({
         if (!Object.keys(draggingEntity).length) {
             saveState(newTiers);
         }
-    }
+    }, [getTiersCopy, draggingEntity, saveState]);
 
     /**
      * need to hide for mobile, removing ghost causes error
@@ -136,8 +136,7 @@ export default function TierList({
         if (draggingEntity && !Object.keys(draggingEntity).length) {
             removeGhostEntities();
         }
-        // eslint-disable-next-line
-    }, [draggingEntity]);
+    }, [draggingEntity, removeGhostEntities]);
 
     function moveEntityToIndex(e, tierIndex, entityIndex) {
         e?.stopPropagation();

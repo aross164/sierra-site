@@ -9,21 +9,12 @@ import AppContext from './contexts/AppContext';
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
 import {getDatabase, ref, get} from 'firebase/database';
+import {FIREBASE_CONFIG} from './constants';
+import {buildTeams} from './utils/teams';
+import {resolveNflWeek, computeNewestWeek} from './utils/week';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyC6hAA-uE-l85kitNt91a2tss9H9lj7ZHE",
-    authDomain: "sierra-site-300d4.firebaseapp.com",
-    projectId: "sierra-site-300d4",
-    storageBucket: "sierra-site-300d4.appspot.com",
-    messagingSenderId: "133304947715",
-    appId: "1:133304947715:web:c8ed9cf3af89829c4f6a36"
-};
-
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(FIREBASE_CONFIG);
 const db = getDatabase(app);
-const year = '2025';
-const rankingsRef = ref(db, `rankings/${year}`);
 
 function App({sierraId}) {
     const [teams, setTeams] = useState({});
@@ -31,7 +22,13 @@ function App({sierraId}) {
     const [allRankings, setAllRankings] = useState([]);
     const [scores, setScores] = useState({});
     const [league, setLeague] = useState('');
-    const [season, setSeason] = useState(year);
+    const [season, setSeason] = useState(null);
+    const [rankingsRef, setRankingsRef] = useState(null);
+    const [sierraLeagueIds, setSierraLeagueIds] = useState(null);
+    const [sierraSeasonLeagues, setSierraSeasonLeagues] = useState({});
+    const [bracketSeasons, setBracketSeasons] = useState(null);
+    const [rankingsSeasons, setRankingsSeasons] = useState(null);
+    const [hasBrackets, setHasBrackets] = useState(false);
     const location = useLocation();
 
     useEffect(() => {
@@ -41,81 +38,133 @@ function App({sierraId}) {
         setLeague(new URLSearchParams(location.search).get('league'));
     }, [location]);
 
+    // Sleeper renews a league into a new league ID each season, so walk the chain of
+    // previous_league_id back from this season's Sierra league to find every past one too.
+    useEffect(() => {
+        (async () => {
+            const ids = [sierraId];
+            const seasonLeagues = {};
+            let currentId = sierraId;
+            while(currentId){
+                const response = await fetch(`https://api.sleeper.app/v1/league/${currentId}`);
+                if(!response.ok){
+                    break;
+                }
+                const {season: leagueSeason, previous_league_id} = await response.json();
+                if(leagueSeason){
+                    seasonLeagues[leagueSeason] = currentId;
+                }
+                if(!previous_league_id || previous_league_id === '0'){
+                    break;
+                }
+                ids.push(previous_league_id);
+                currentId = previous_league_id;
+            }
+            setSierraLeagueIds(ids);
+            setSierraSeasonLeagues(seasonLeagues);
+        })();
+    }, [sierraId]);
+
+    // Only some seasons have predicted brackets stored in Firebase - fetch the list once
+    // so the bracket results page can offer a select limited to years with real data.
+    useEffect(() => {
+        get(ref(db, 'brackets')).then(snapshot => setBracketSeasons(snapshot.exists() ? Object.keys(snapshot.val()) : []));
+    }, []);
+
+    // Rankings are also stored per-season in Firebase - fetch the list once so the
+    // rankings page can offer a select limited to years with real data.
+    useEffect(() => {
+        get(ref(db, 'rankings')).then(snapshot => setRankingsSeasons(snapshot.exists() ? Object.keys(snapshot.val()) : []));
+    }, []);
+
     useEffect(() => {
         if(!league){
             return;
         }
 
+        async function fetchTeams(){
+            const usersResponse = await fetch(`https://api.sleeper.app/v1/league/${league}/users`);
+            const usersRaw = await usersResponse.json();
+
+            const rostersResponse = await fetch(`https://api.sleeper.app/v1/league/${league}/rosters`);
+            const rostersRaw = await rostersResponse.json();
+
+            setTeams(buildTeams(usersRaw, rostersRaw));
+        }
+
+        async function fetchWeek(){
+            async function fetchNflWeek(){
+                const response = await fetch('https://api.sleeper.app/v1/state/nfl');
+                const weekInfo = await response.json();
+                return resolveNflWeek(weekInfo);
+            }
+
+            async function fetchLeagueInfo(){
+                const leagueInfoResponse = await fetch(`https://api.sleeper.app/v1/league/${league}`);
+                const json = await leagueInfoResponse.json();
+                const {season: curSeason, settings, status} = json;
+                setSeason(curSeason);
+                return {playoffStart: settings.playoff_week_start, status};
+            }
+
+            const nflWeekPromise = fetchNflWeek();
+            const leagueInfoPromise = fetchLeagueInfo();
+
+            const [nflWeek, {playoffStart, status}] = await Promise.all([nflWeekPromise, leagueInfoPromise]);
+
+            setNewestWeek(computeNewestWeek(nflWeek, playoffStart, status));
+        }
+
         fetchTeams();
-        fetchRankings();
         fetchWeek();
-        // eslint-disable-next-line
     }, [league]);
 
-    async function fetchTeams(){
-        const usersResponse = await fetch(`https://api.sleeper.app/v1/league/${league}/users`);
-        const usersRaw = await usersResponse.json();
-        const users = usersRaw.reduce((foundUsers, user, index) => {
-            foundUsers[user.user_id] = {
-                teamName: user.metadata.team_name,
-                displayName: user.display_name,
-                avatar: user.metadata.avatar || ''
-            };
-
-            return foundUsers;
-        }, {});
-
-        const rostersResponse = await fetch(`https://api.sleeper.app/v1/league/${league}/rosters`);
-        const rostersRaw = await rostersResponse.json();
-        rostersRaw.forEach(roster => users[roster.owner_id].rosterId = roster.roster_id);
-
-        setTeams(users);
-    }
-
-    async function fetchRankings(){
-        const snapshot = await get(rankingsRef);
-        setAllRankings(snapshot.val());
-    }
-
-    async function fetchWeek(){
-        async function fetchNflWeek(){
-            const response = await fetch('https://api.sleeper.app/v1/state/nfl');
-            const weekInfo = await response.json();
-            if(weekInfo.season_type === 'pre'){
-                return 1;
-            }
-            return weekInfo.week || 18;
+    // The season isn't known until fetchWeek resolves the league's info, so the
+    // rankings ref (and the fetch of its data) waits until season is set.
+    useEffect(() => {
+        if(!season){
+            return;
         }
 
-        async function fetchPlayoffStart(){
-            const leagueInfoResponse = await fetch(`https://api.sleeper.app/v1/league/${league}`);
-            const json = await leagueInfoResponse.json();
-            const {season: curSeason, settings} = json;
-            setSeason(curSeason);
-            return settings.playoff_week_start;
+        setRankingsRef(ref(db, `rankings/${season}`));
+
+        get(ref(db, `brackets/${season}`)).then(snapshot => setHasBrackets(snapshot.exists()));
+    }, [season]);
+
+    useEffect(() => {
+        if(!rankingsRef){
+            return;
         }
 
-        const nflWeekPromise = fetchNflWeek();
-        const playoffStartPromise = fetchPlayoffStart();
-
-        const [nflWeek, playoffStart] = await Promise.all([nflWeekPromise, playoffStartPromise]);
-
-        if(nflWeek > playoffStart - 1){
-            setNewestWeek(playoffStart - 1);
-        } else{
-            setNewestWeek(nflWeek);
+        async function fetchRankings(){
+            const snapshot = await get(rankingsRef);
+            setAllRankings(snapshot.val());
         }
-    }
+
+        fetchRankings();
+    }, [rankingsRef]);
+
+    const sierraLeagueOptions = Object.entries(sierraSeasonLeagues)
+        .sort(([seasonA], [seasonB]) => seasonB - seasonA);
+
+    const bracketLeagueOptions = sierraLeagueOptions
+        .filter(([season]) => bracketSeasons?.includes(season));
+
+    const rankingsLeagueOptions = sierraLeagueOptions
+        .filter(([season]) => rankingsSeasons?.includes(season));
 
     return (
         <AppContext.Provider
-            value={{league, newestWeek, teams, allRankings, db, rankingsRef, season, scores, setScores, sierraId}}>
+            value={{
+                league, newestWeek, teams, allRankings, db, rankingsRef, season, scores, setScores, sierraId,
+                sierraLeagueIds, sierraLeagueOptions, bracketLeagueOptions, rankingsLeagueOptions
+            }}>
             <div className="app">
                 <Outlet/>
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/>
             </div>
             {
-                league === sierraId ?
+                sierraLeagueIds?.includes(league) ?
                     <footer>
                         <Link to={`/rankings?league=${league}`} className="footerPage">
                             <div>Rankings</div>
@@ -142,16 +191,20 @@ function App({sierraId}) {
                                 location.pathname === '/schedules' && <div className="activePage"/>
                             }
                         </Link>
-                        <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
-                            <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
-                        </div>
-                        <Link to={`/bracketresults?league=${league}`} className="footerPage">
-                            <div>Brackets</div>
-                            {
-                                (location.pathname === '/' || location.pathname.includes('bracketresults')) &&
-                                <div className="activePage"/>
-                            }
-                        </Link>
+                        {
+                            hasBrackets && <>
+                                <div style={{display: 'flex', width: '2px', height: '100%', alignItems: 'center'}}>
+                                    <div style={{height: '60%', width: '100%', backgroundColor: 'white'}}/>
+                                </div>
+                                <Link to={`/bracketresults?league=${league}`} className="footerPage">
+                                    <div>Brackets</div>
+                                    {
+                                        (location.pathname === '/' || location.pathname.includes('bracketresults')) &&
+                                        <div className="activePage"/>
+                                    }
+                                </Link>
+                            </>
+                        }
                     </footer>
                     : null
             }

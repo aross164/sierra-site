@@ -1,13 +1,32 @@
 import React, {useContext, useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import AppContext from '../contexts/AppContext';
 import {fetchPlayerInfo} from "../utils/utils";
+import {getTradeWeek, computeTradeValue} from "../utils/trades";
+import WaSelect from '@awesome.me/webawesome/dist/react/select/index.js';
+import WaOption from '@awesome.me/webawesome/dist/react/option/index.js';
+import useWaSelectChange from '../hooks/useWaSelectChange';
 
 function Trades(){
-    const {newestWeek, league, teams, sierraId, season} = useContext(AppContext);
+    const {newestWeek, league, teams, sierraLeagueIds, sierraLeagueOptions, season} = useContext(AppContext);
 
-    if(league && league !== sierraId){
+    if(league && sierraLeagueIds && !sierraLeagueIds.includes(league)){
         window.location.replace(`${window.location.origin}/schedules?league=${league}`)
     }
+
+    const navigate = useNavigate();
+    const seasonSelectRef = useWaSelectChange(
+        selectedLeague => navigate(`/trades?league=${selectedLeague}`)
+    );
+    const selectedSeasonLeague = sierraLeagueOptions?.some(([, optionLeague]) => optionLeague === league) ? league : undefined;
+    const seasonSelect = sierraLeagueOptions?.length > 1 && (
+        <WaSelect ref={seasonSelectRef} label="Season" value={selectedSeasonLeague} placeholder="Select a season"
+                  style={{maxWidth: '10em', marginBottom: '1em'}}>
+            {sierraLeagueOptions.map(([optionSeason, optionLeague]) => (
+                <WaOption key={optionLeague} value={optionLeague}>{optionSeason}</WaOption>
+            ))}
+        </WaSelect>
+    );
 
     const [trades, setTrades] = useState([]);
     const [players, setPlayers] = useState({});
@@ -65,28 +84,13 @@ function Trades(){
             setPlayers(newPlayers);
 
             newTrades.forEach(trade => {
+                const tradeWeek = getTradeWeek(trade);
                 Object.values(trade.adds).forEach(addGroup => {
                     addGroup.forEach(add => {
-                        const stats = Object.entries(newPlayers[add.playerId].stats);
-                        let numWeeks = 0;
-                        let totalPoints = 0;
-                        stats.forEach(([week, weekStats]) => {
-                            const tradeWeek = getTradeWeek(trade);
-                            if(week < tradeWeek || !(weekStats?.stats.off_snp || weekStats?.stats.def_snp)){
-                                // probably didn't play
-                                return;
-                            }
-                            numWeeks++;
-                            let points = weekStats.stats.pts_ppr || 0;
-                            if(newPlayers[add.playerId].position === 'QB'){
-                                // sleeper only counts INTs as -1
-                                points -= (weekStats.stats.pass_int || 0) * 1;
-                            }
-                            totalPoints += points;
-                        });
-                        if(numWeeks){
-                            add.points = totalPoints;
-                            add.average = totalPoints / numWeeks;
+                        const value = computeTradeValue(newPlayers[add.playerId], tradeWeek);
+                        if(value){
+                            add.points = value.points;
+                            add.average = value.average;
                         }
                     });
                 });
@@ -115,36 +119,28 @@ function Trades(){
             return playerData;
         }
 
-        function getTradeWeek(trade){
-            let week = trade.week;
-
-            const date = new Date(trade.status_updated);
-            const dayName = date.toLocaleString("en-US", {
-                timeZone: "America/Chicago",
-                weekday: 'long'
-            });
-            if(['Monday', 'Tuesday'].includes(dayName)){ // really need to see if players already played before trade
-                week++;
-            }
-
-            return week;
-        }
-
         fetchTrades();
     }, [newestWeek, league, season]);
 
     if(loading){
-        return <div>Loading</div>;
+        return (<div>
+            {seasonSelect}
+            <div>Loading</div>
+        </div>);
     }
 
     if(!Object.keys(trades).length){
-        return <div>No trades</div>;
+        return (<div>
+            {seasonSelect}
+            <div>No trades</div>
+        </div>);
     }
 
     return (
         <div className="trades-page flex justify-center">
             <div>
                 <h1>Trades</h1>
+                {seasonSelect}
                 {Object.entries(trades).map(([week, curTrades]) => (
                     <div key={week} style={{marginBottom: '3em'}}>
                         <h2 style={{fontSize: '1.75em'}}>Week {week - 1}.5</h2>

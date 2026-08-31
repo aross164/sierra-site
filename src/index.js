@@ -13,14 +13,13 @@ import Schedules from './routes/Schedules';
 import TierListPage from './routes/TierListPage';
 import Brackets from './routes/Brackets';
 import BracketResults from './routes/BracketResults';
-
-const sierraId = '1244742207345270784';
+import {SIERRA_LEAGUE_ID} from './constants';
+import {computeSierraRedirect} from './utils/sierraLoader';
 
 function sierraLoader({request}){
-    const url = new URL(request.url);
-    const league = url.searchParams.get('league');
-    if(!league){
-        window.location.replace(`${request.url}?league=${sierraId}`);
+    const redirectUrl = computeSierraRedirect(request.url, SIERRA_LEAGUE_ID);
+    if(redirectUrl){
+        window.location.replace(redirectUrl);
     }
 
     return {};
@@ -29,7 +28,7 @@ function sierraLoader({request}){
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App sierraId={sierraId} />,
+        element: <App sierraId={SIERRA_LEAGUE_ID} />,
         children: [
             {
                 path: '/',

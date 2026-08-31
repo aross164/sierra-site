@@ -43,18 +43,18 @@ export default function Brackets() {
         if (!league) {
             return;
         }
-        fetchBracket();
-        // eslint-disable-next-line
-    }, [league]);
 
-    async function fetchBracket() {
-        const winnersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/winners_bracket`);
-        const losersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/losers_bracket`);
-        const [winnerBracketJson, losersBracketJson] = await Promise.all([winnersBracketRes, losersBracketRes]);
-        const [curWinnersBracket, curLosersBracket] = await Promise.all([winnerBracketJson.json(), losersBracketJson.json()]);
-        setWinnersBracket(curWinnersBracket);
-        setLosersBracket(curLosersBracket);
-    }
+        async function fetchBracket() {
+            const winnersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/winners_bracket`);
+            const losersBracketRes = fetch(`https://api.sleeper.app/v1/league/${league}/losers_bracket`);
+            const [winnerBracketJson, losersBracketJson] = await Promise.all([winnersBracketRes, losersBracketRes]);
+            const [curWinnersBracket, curLosersBracket] = await Promise.all([winnerBracketJson.json(), losersBracketJson.json()]);
+            setWinnersBracket(curWinnersBracket);
+            setLosersBracket(curLosersBracket);
+        }
+
+        fetchBracket();
+    }, [league]);
 
     if (!(winnersBracket && losersBracket)) {
         return <div>Getting brackets</div>;
@@ -65,11 +65,11 @@ export default function Brackets() {
             otherUser ? <h1>{`${teams[otherUser]?.displayName}'s Bracket`}</h1> : null
         }
         <Bracket bracket={winnersBracket} bracketRef={bracketRef} picks={picks?.winning} teams={teamsByRosterId}
-                 title="Winner's Bracket" winning editable={user}
+                 title="Winners Bracket" winning editable={user}
         />
         <div style={{marginTop: '4em'}}></div>
         <Bracket bracket={losersBracket} bracketRef={bracketRef} picks={picks?.losing} teams={teamsByRosterId}
-                 title="Losers's Bracket" editable={user}
+                 title="Losers Bracket" editable={user}
         />
     </div>);
 }

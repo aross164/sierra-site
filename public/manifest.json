@@ -1,0 +1,11 @@
+{
+  "short_name": "SFL",
+  "start_url" : "/",
+  "icons": [
+    {
+      "src": "images/sflLogo.png",
+      "sizes": "1024x1024"
+    }
+  ],
+  "display": "standalone"
+}

@@ -1,15 +1,23 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import AppContext from '../contexts/AppContext';
 import {convertFromRaw} from 'draft-js';
 import {stateToHTML} from 'draft-js-export-html';
 import TierList from '../components/TierList';
+import WaSelect from '@awesome.me/webawesome/dist/react/select/index.js';
+import WaOption from '@awesome.me/webawesome/dist/react/option/index.js';
+import useWaSelectChange from '../hooks/useWaSelectChange';
 
 function Rankings() {
-    const {newestWeek, teams, allRankings, league, sierraId} = useContext(AppContext);
-    if (league && league !== sierraId) {
+    const {newestWeek, teams, allRankings, league, sierraLeagueIds, rankingsLeagueOptions} = useContext(AppContext);
+    if (league && sierraLeagueIds && !sierraLeagueIds.includes(league)) {
         window.location.replace(`${window.location.origin}/schedules?league=${league}`);
     }
+    const navigate = useNavigate();
+    const seasonSelectRef = useWaSelectChange(
+        selectedLeague => navigate(`/rankings?league=${selectedLeague}`)
+    );
+    const selectedSeasonLeague = rankingsLeagueOptions?.some(([, optionLeague]) => optionLeague === league) ? league : undefined;
     let {week: currentWeek} = useParams();
 
     if (!currentWeek) {
@@ -56,6 +64,15 @@ function Rankings() {
         <div style={{flexDirection: 'column'}} className="flex align-center display-rankings">
             <div style={{maxWidth: '620px'}}>
                 <h1>Sierra Week {currentWeek} Rankings</h1>
+                {
+                    rankingsLeagueOptions?.length > 1 &&
+                    <WaSelect ref={seasonSelectRef} label="Season" value={selectedSeasonLeague}
+                              placeholder="Select a season" style={{maxWidth: '10em', marginBottom: '1em'}}>
+                        {rankingsLeagueOptions.map(([optionSeason, optionLeague]) => (
+                            <WaOption key={optionLeague} value={optionLeague}>{optionSeason}</WaOption>
+                        ))}
+                    </WaSelect>
+                }
                 <div className="flex align-center" style={{gap: '1em', marginBottom: '1em'}}>
                     <div>Select Week:</div>
                     <div className="flex" style={{flexWrap: 'wrap', gap: '1em 2em'}}>
