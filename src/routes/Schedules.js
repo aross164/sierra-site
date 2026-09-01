@@ -200,7 +200,7 @@ function Schedules(){
         <LeaguePicker basePath="schedules" league={league} leagues={leagues}/>
         <h2>Grid</h2>
         <div style={{overflow: 'auto'}}>
-            <table className="schedules">
+            <table className="schedules grid">
                 <thead>
                 <tr>
                     <th>Team</th>

@@ -38,6 +38,18 @@ function App({sierraId}) {
         setLeague(new URLSearchParams(location.search).get('league'));
     }, [location]);
 
+    // The initial theme class is set synchronously in public/index.html to avoid a flash
+    // of the wrong theme; this just keeps it in sync if the OS theme changes while open.
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const applyTheme = ({matches}) => {
+            document.documentElement.classList.toggle('wa-dark', matches);
+            document.documentElement.classList.toggle('wa-light', !matches);
+        };
+        mediaQuery.addEventListener('change', applyTheme);
+        return () => mediaQuery.removeEventListener('change', applyTheme);
+    }, []);
+
     // Sleeper renews a league into a new league ID each season, so walk the chain of
     // previous_league_id back from this season's Sierra league to find every past one too.
     useEffect(() => {

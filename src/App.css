@@ -8,6 +8,18 @@
     width: auto;
 }
 
+/* Shared, theme-aware border color for every table's cells - individual tables just set
+   border-width/border-style (not the border shorthand, which would reset this color). */
+.app :is(td, th) {
+    border-color: var(--wa-color-surface-border);
+}
+
+@media (prefers-color-scheme: light ){
+    .app :is(td, th) {
+        border-color: black;
+    } 
+}
+
 h1 {
     margin-top: 0;
     text-align: center;
@@ -48,19 +60,15 @@ wa-select wa-divider {
 }
 
 .week-option {
-    text-decoration: underline;
-    color: #0066cc;
+    /* Colors and hover state come from webawesome's own link styling (a { color:
+       var(--wa-color-text-link) }), which is already theme-aware. */
     cursor: pointer;
 }
 
 .week-option.current {
     text-decoration: none;
     cursor: default;
-    color: black;
-}
-
-.week-option:not(.current):hover {
-    color: #ee0000;
+    color: var(--wa-color-text-normal);
 }
 
 .save-button {
@@ -70,7 +78,7 @@ wa-select wa-divider {
 }
 
 .blurb-container {
-    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--wa-color-surface-border);
     padding: 0.5em;
     margin-bottom: 1em;
     border-radius: 0.375em;
@@ -78,6 +86,14 @@ wa-select wa-divider {
 
 p {
     margin: 0;
+}
+
+button {
+    /* Brand color (rather than a neutral gray, which read as disabled) so buttons look
+       clickable and stay visible against the page background in both themes. */
+    color: var(--wa-color-brand-on-loud);
+    background-color: var(--wa-color-brand-fill-loud);
+    border: 1px solid var(--wa-color-brand-border-loud);
 }
 
 .public-DraftStyleDefault-block {
@@ -105,7 +121,7 @@ p {
 
 .trade-container {
     padding: 0.5em;
-    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--wa-color-surface-border);
     margin-bottom: 1.25em;
     border-radius: 0.3em;
     max-width: min(91vw, 400px);
@@ -129,6 +145,10 @@ p {
 footer {
     height: 3rem;
     background-color: black;
+    /* The footer is deliberately always black/white regardless of theme, but in dark
+       mode that's nearly the same as the page background - this border keeps it from
+       blending into the page above it. */
+    border-top: 1px solid var(--wa-color-surface-border);
     width: 100vw;
     position: fixed;
     bottom: 0;
@@ -247,11 +267,22 @@ figure img {
 
 .schedules :is(td, th) {
     padding: 0.25em;
-    border: 1px solid black
+    border-width: 1px;
+    border-style: solid;
 }
 
 .schedules th {
     padding-bottom: 0;
+}
+
+.schedules :is(.same, .more, .less) {
+    /* These highlights are pastel backgrounds meant to be read with dark text,
+       regardless of whether the page itself is in light or dark mode. */
+    color: black;
+}
+
+.schedules.grid td:not(.same, .more, .less, .grid-team) {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .schedules .same {
@@ -269,7 +300,7 @@ figure img {
 .schedules :is(td:first-child, th:first-child) {
     left: 0;
     position: sticky;
-    background-color: white;
+    background-color: var(--wa-color-surface-default);
 }
 
 .schedules .grid-team {
@@ -335,7 +366,11 @@ figure img {
             margin-top: 0.5em;
             display: flex;
             align-items: center;
+            /* Sits on the tier's own background color (doesn't change with theme), so
+               this shouldn't pick up the site-wide brand-colored button style. */
             color: black;
+            background-color: white;
+            border: 1px solid black;
         }
     }
 
@@ -352,6 +387,9 @@ figure img {
         padding: 0.25em 0.5em;
         gap: 0.5em 0.25em;
         overflow: hidden; /* needed because we're allowing ellipsis overflow to be visible */
+        /* Sits on the tier's own background color (set inline, doesn't change with
+           theme), so its text shouldn't change with theme either. */
+        color: black;
     }
 
     .editable .rankings {
@@ -562,6 +600,10 @@ figure img {
         text-overflow: ellipsis;
     }
 
+    .win-advance .advance, .loss-advance .advance {
+        /* Pastel highlights meant to be read with dark text in either theme. */
+        color: black;
+    }
     .win-advance .advance {
         background-color: lightgreen;
     }
@@ -595,7 +637,8 @@ figure img {
         border-spacing: 0;
     }
     td, th {
-        border: 1px solid black;
+        border-width: 1px;
+        border-style: solid;
         padding: 5px 7px;
     }
     td:nth-child(2) {

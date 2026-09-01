@@ -11,6 +11,13 @@
     />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="stylesheet" href="https://ka-f.webawesome.com/webawesome@3.12.0/styles/webawesome.css" />
+    <script>
+      // Set the WebAwesome theme class before first paint so there's no flash of the
+      // wrong theme; App.js takes over live updates (OS theme changes) after mount.
+      document.documentElement.classList.add(
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'wa-dark' : 'wa-light'
+      );
+    </script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.

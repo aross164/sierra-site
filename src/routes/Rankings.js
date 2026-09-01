@@ -45,6 +45,7 @@ function Rankings() {
 
     useEffect(() => {
         if (!allRankings?.length || !allRankings[currentWeek]?.rankings) {
+            setRankings({});
             return;
         }
 
@@ -121,7 +122,7 @@ function Rankings() {
                                     <div dangerouslySetInnerHTML={{__html: rankings[teamId].blurb}}></div>
                                 </div>
                             ))
-                        : null
+                        : (!allRankings?.[currentWeek]?.tiers ? <p>No rankings have been posted for week {currentWeek} yet.</p> : null)
                 }
             </div>
         </div>
