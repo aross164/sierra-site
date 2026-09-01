@@ -89,11 +89,12 @@ p {
 }
 
 button {
-    /* Brand color (rather than a neutral gray, which read as disabled) so buttons look
+    /* Muted slate (rather than a neutral gray, which read as disabled, or WebAwesome's
+       default brand blue, which didn't fit the site's muted palette) so buttons look
        clickable and stay visible against the page background in both themes. */
-    color: var(--wa-color-brand-on-loud);
-    background-color: var(--wa-color-brand-fill-loud);
-    border: 1px solid var(--wa-color-brand-border-loud);
+    color: #f1f3f5;
+    background-color: #4a5568;
+    border: 1px solid #3a4453;
 }
 
 .public-DraftStyleDefault-block {
