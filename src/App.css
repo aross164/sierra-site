@@ -44,7 +44,9 @@ wa-select wa-divider {
 }
 
 .editor-container {
-    border: 1px solid black;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--wa-color-surface-border);
 }
 
 .flex {
@@ -204,6 +206,67 @@ footer a {
 .editor-area {
     min-height: 10em;
     padding: 0.5em;
+}
+
+/* react-draft-wysiwyg ships hardcoded light colors (react-draft-wysiwyg.css) with no
+   theme support, so re-skin it to follow webawesome's dark theme. */
+.wa-dark {
+    :is(.rdw-editor-toolbar, .rdw-option-wrapper, .rdw-dropdown-wrapper, .rdw-dropdown-optionwrapper,
+        .rdw-colorpicker-modal, .rdw-link-modal, .rdw-embedded-modal, .rdw-emoji-modal, .rdw-image-modal,
+        .rdw-suggestion-dropdown, .rdw-image-alignment-options-popup, .rdw-link-modal-btn,
+        .rdw-embedded-modal-btn, .rdw-image-modal-btn, .rdw-link-modal-input, .rdw-embedded-modal-link-input,
+        .rdw-image-modal-url-input, .rdw-image-modal-size-input, .rdw-image-modal-alt-input) {
+        background: var(--wa-color-surface-raised);
+        border-color: var(--wa-color-surface-border);
+        color: var(--wa-color-text-normal);
+    }
+
+    :is(.rdw-option-wrapper, .rdw-dropdown-wrapper, .rdw-dropdown-optionwrapper, .rdw-link-modal-btn,
+        .rdw-embedded-modal-btn, .rdw-image-modal-btn):hover {
+        background-color: var(--wa-color-neutral-fill-quiet);
+    }
+
+    :is(.rdw-dropdownoption-highlighted, .rdw-dropdownoption-active, .rdw-suggestion-option-active) {
+        background: var(--wa-color-neutral-fill-quiet);
+    }
+
+    .rdw-editor-main {
+        background: var(--wa-color-surface-default);
+        color: var(--wa-color-text-normal);
+    }
+
+    .public-DraftEditorPlaceholder-root {
+        color: var(--wa-color-text-quiet);
+    }
+
+    :is(.rdw-dropdown-carettoopen, .rdw-dropdown-carettoclose) {
+        border-top-color: var(--wa-color-text-normal);
+        border-bottom-color: var(--wa-color-text-normal);
+    }
+
+    :is(.rdw-editor-main pre, .rdw-image-modal-upload-option) {
+        background: var(--wa-color-surface-lowered);
+    }
+
+    .rdw-editor-main blockquote {
+        border-left-color: var(--wa-color-surface-border);
+    }
+
+    /* react-draft-wysiwyg's :disabled buttons keep a hardcoded light-gray background
+       (#ece9e9) regardless of theme, which combined with our light text color above is
+       unreadable - give disabled buttons their own theme-aware muted colors. */
+    :is(.rdw-link-modal-btn, .rdw-embedded-modal-btn, .rdw-image-modal-btn):disabled {
+        background: var(--wa-color-surface-lowered);
+        color: var(--wa-color-text-quiet);
+    }
+
+    /* Toolbar/option icons are <img> tags pointing at black-filled inline SVGs, so their
+       color can't be reached directly - invert them instead. Scoped to the toolbar (not
+       .rdw-editor-main) so actual embedded photos in the blurb aren't affected, and the
+       upload preview thumbnail (a real user image, not an icon) is excluded too. */
+    .rdw-editor-toolbar img:not(.rdw-image-modal-upload-option-image-preview) {
+        filter: invert(1);
+    }
 }
 
 figure {
