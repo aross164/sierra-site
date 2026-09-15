@@ -229,8 +229,8 @@ function Schedules(){
                                 colorClass = 'less';
                             }
                             return (<td key={columnRosterId}
-                                        className={colorClass}>{wins}&nbsp;-&nbsp;{losses}{ties ?
-                                <span>&nbsp;-&nbsp;{ties}</span> : null}</td>);
+                                        className={colorClass}>{wins}-{losses}{ties ?
+                                <span>-{ties}</span> : null}</td>);
                         })}
                     </tr>);
                 })}
