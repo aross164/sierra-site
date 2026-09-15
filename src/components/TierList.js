@@ -132,11 +132,17 @@ export default function TierList({
         setDraggingEntity({});
     }
 
+    const removeGhostEntitiesRef = useRef(removeGhostEntities);
+    removeGhostEntitiesRef.current = removeGhostEntities;
+
     useEffect(() => {
         if (draggingEntity && !Object.keys(draggingEntity).length) {
-            removeGhostEntities();
+            removeGhostEntitiesRef.current();
         }
-    }, [draggingEntity, removeGhostEntities]);
+        // removeGhostEntities is read via a ref so its (frequently-changing) identity
+        // doesn't retrigger this effect - it should only run when a drag actually ends.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [draggingEntity]);
 
     function moveEntityToIndex(e, tierIndex, entityIndex) {
         e?.stopPropagation();

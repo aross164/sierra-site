@@ -6,13 +6,13 @@ import TierList from '../components/TierList';
 import RankingsEditors from '../components/RankingsEditors';
 
 function EditRankings({week}) {
-    const {teams, allRankings, rankingsRef} = useContext(AppContext);
+    const {teams, allRankings, rankingsLoaded, rankingsRef} = useContext(AppContext);
     const [editorStates, setEditorStates] = useState({});
     const [saveButtonText, setSaveButtonText] = useState('Save');
     const [saved, setSaved] = useState(true);
 
     useEffect(() => {
-        if (!allRankings?.length) {
+        if (!rankingsLoaded || !Object.keys(teams).length) {
             return;
         }
 
@@ -34,7 +34,7 @@ function EditRankings({week}) {
             }, {});
             setEditorStates(blankEditors);
         }
-    }, [week, allRankings, teams]);
+    }, [week, allRankings, rankingsLoaded, teams]);
 
     const getStringifiedEditorStates = useCallback((states) => {
         let curStates = states;
@@ -138,7 +138,7 @@ function EditRankings({week}) {
 
     return (
         <>
-            <div style={{flexDirection: 'column', paddingRight: '2em'}} className="flex align-center edit-rankings">
+            <div style={{flexDirection: 'column'}} className="flex align-center edit-rankings">
                 <h1>Week {week} Rankings</h1>
                 <TierList entities={Object.entries(teams).map(([teamId, team]) => ({...team, id: teamId}))} editable
                           type="team" saveState={saveTiers}

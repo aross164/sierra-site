@@ -217,6 +217,8 @@ figure img {
 }
 
 .edit-rankings {
+    padding-right: 2em;
+
     .tier-list-container {
         width: 100%;
         max-width: 95em;
@@ -231,9 +233,11 @@ figure img {
         height: 0;
     }
 
-    .edit-rankings h2 {
+    .edit-rankings {
+        padding-right: 0;
+        h2 {
         font-size: 1.1em;
-    }
+    }}
 
     .blurb-container h2, .trade-container h3 {
         font-size: 1.25em;
@@ -250,6 +254,16 @@ figure img {
 
     .editor-area {
         min-height: auto;
+    }
+
+    .tier-list-container {
+        .tier-list .tier-name {
+            padding-inline: 2px;
+        }
+
+        .tier-name-input {
+            padding: 0.25em;
+        }
     }
 }
 
@@ -458,6 +472,7 @@ figure img {
 
     .tier-name-input {
         width: 100%;
+        min-width: 6.75em;
     }
 
     .move {

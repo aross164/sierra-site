@@ -20,6 +20,7 @@ function App({sierraId}) {
     const [teams, setTeams] = useState({});
     const [newestWeek, setNewestWeek] = useState(0);
     const [allRankings, setAllRankings] = useState([]);
+    const [rankingsLoaded, setRankingsLoaded] = useState(false);
     const [scores, setScores] = useState({});
     const [league, setLeague] = useState('');
     const [season, setSeason] = useState(null);
@@ -150,7 +151,8 @@ function App({sierraId}) {
 
         async function fetchRankings(){
             const snapshot = await get(rankingsRef);
-            setAllRankings(snapshot.val());
+            setAllRankings(snapshot.val() || []);
+            setRankingsLoaded(true);
         }
 
         fetchRankings();
@@ -168,7 +170,7 @@ function App({sierraId}) {
     return (
         <AppContext.Provider
             value={{
-                league, newestWeek, teams, allRankings, db, rankingsRef, season, scores, setScores, sierraId,
+                league, newestWeek, teams, allRankings, rankingsLoaded, db, rankingsRef, season, scores, setScores, sierraId,
                 sierraLeagueIds, sierraLeagueOptions, bracketLeagueOptions, rankingsLeagueOptions
             }}>
             <div className="app">
