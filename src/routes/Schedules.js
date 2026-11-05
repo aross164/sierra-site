@@ -243,7 +243,15 @@ function Schedules(){
         </div>
         <table className="schedules">
             <tbody>
-            {Object.entries(whatIfScores).sort((a, b) => b[1].trueRecord.wins - a[1].trueRecord.wins)
+            {Object.entries(whatIfScores).sort((a, b) => {
+                const diff = b[1].trueRecord.wins - a[1].trueRecord.wins;
+                if(diff > 0){
+                    return 1;
+                } else if(diff < 0){
+                    return -1;
+                }
+                return a[1].trueRecord.losses - b[1].trueRecord.losses;
+            })
                    .map(([rowRosterId, {trueRecord}], index) => {
                        const team = Object.values(teams)
                                           .find(team => parseInt(team.rosterId) === parseInt(rowRosterId));
